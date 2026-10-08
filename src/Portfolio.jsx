@@ -33,6 +33,10 @@ function sortImagesByNewest(images) {
   return [...images].sort((a, b) => getCreatedAtValue(b) - getCreatedAtValue(a));
 }
 
+function thumbSrc(photo) {
+  return photo?.thumbUrl || photo?.url || '';
+}
+
 function formatMoney(amount) {
   if (!Number.isFinite(amount) || amount <= 0) {
     return '';
@@ -842,7 +846,7 @@ export default function Portfolio() {
       '',
       ...requestedImages.flatMap((image, index) => [
         `${index + 1}. ${image.label || 'Imagen'}${image.category ? ` - ${image.category}` : ''}`,
-        image.originalUrl || image.url,
+        image.url || image.originalUrl,
         '',
       ]),
     ];
@@ -2494,7 +2498,7 @@ export default function Portfolio() {
                       >
                         <div className="card-media">
                           <img
-                            src={album.cover?.url || album.images[0]?.url}
+                            src={thumbSrc(album.cover) || thumbSrc(album.images[0])}
                             alt={album.title}
                             loading="lazy"
                             onContextMenu={blockImageInteraction}
@@ -2519,7 +2523,7 @@ export default function Portfolio() {
                       >
                         <div className="card-media">
                           <img
-                            src={group.cover?.url || group.images[0]?.url}
+                            src={thumbSrc(group.cover) || thumbSrc(group.images[0])}
                             alt={group.title}
                             loading="lazy"
                             onContextMenu={blockImageInteraction}
@@ -2543,7 +2547,7 @@ export default function Portfolio() {
                       >
                           <div className="card-media">
                             <img
-                              src={album.cover?.url || album.images[0]?.url}
+                              src={thumbSrc(album.cover) || thumbSrc(album.images[0])}
                               alt={album.title}
                               loading="lazy"
                               onContextMenu={blockImageInteraction}
@@ -2578,7 +2582,7 @@ export default function Portfolio() {
                     >
                       <div className="card-media">
                         <img
-                          src={album.cover?.url || album.images[0]?.url}
+                          src={thumbSrc(album.cover) || thumbSrc(album.images[0])}
                           alt={album.title}
                           loading="lazy"
                           onContextMenu={blockImageInteraction}
@@ -2612,7 +2616,7 @@ export default function Portfolio() {
                   >
                     <div className="card-media">
                       <img
-                        src={category.cover?.url || category.images[0]?.url}
+                        src={thumbSrc(category.cover) || thumbSrc(category.images[0])}
                         alt={category.name}
                         loading="lazy"
                         onContextMenu={blockImageInteraction}
@@ -2680,7 +2684,7 @@ export default function Portfolio() {
                           onClick={() => setModalIndex(index)}
                         >
                           <img
-                            src={image.url}
+                            src={thumbSrc(image)}
                             alt={image.label || `Foto ${index + 1}`}
                             onContextMenu={blockImageInteraction}
                             onDragStart={blockImageInteraction}
@@ -2875,7 +2879,7 @@ export default function Portfolio() {
                         }`}
                         onClick={() => setModalIndex(index)}
                       >
-                        <img src={image.url} alt={image.label || `Miniatura ${index + 1}`} />
+                        <img src={thumbSrc(image)} alt={image.label || `Miniatura ${index + 1}`} />
                       </button>
                     ))}
                   </div>
