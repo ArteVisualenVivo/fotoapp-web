@@ -86,19 +86,33 @@ export function buildCloudinaryOptimizedUrl(sourceUrl, publicId) {
 
 const CLOUDINARY_UPLOAD_MARKER = "/image/upload/";
 const PUBLIC_WATERMARK_TEXT = "cesardarioph";
-const PUBLIC_WATERMARK_ROWS = [-650, -520, -390, -260, -130, 0, 130, 260, 390, 520, 650];
+// Blanco con alfa: 6 digitos de color + 2 de alfa (B3 = ~70% opaco).
+// l_text NO acepta el parametro opacity; la transparencia va en el color.
+const PUBLIC_WATERMARK_COLOR = "FFFFFFB3";
 
-function buildWatermarkSteps() {
-  return PUBLIC_WATERMARK_ROWS.map((y, index) => {
-    const x = index % 2 === 0 ? "" : ":x_90";
-    return `l_text:Arial_70_bold:${PUBLIC_WATERMARK_TEXT}:co_rgb:FFFFFF:bo_3px:white:opacity_90:y_${y}${x}/fl_layer_apply`;
-  });
+// Patron de filas proporcionado al ancho: el texto cruza toda la imagen
+// (y por tanto todos los rostros). La sintaxis correcta de Cloudinary es
+//   l_text:<fuente>:<texto>,<opciones>/fl_layer_apply,<posicion>
+// las opciones se separan del texto con COMA, nunca con dos puntos.
+function buildWatermarkSteps(maxWidth) {
+  const fontSize = Math.max(24, Math.round(maxWidth * 0.075));
+  const spacing = Math.round(fontSize * 1.7);
+  const range = Math.round(maxWidth * 0.6);
+  const steps = [];
+  let index = 0;
+  for (let y = -range; y <= range; y += spacing, index += 1) {
+    const x = index % 2 === 0 ? "" : ",x_90";
+    steps.push(
+      `l_text:Arial_${fontSize}_bold:${PUBLIC_WATERMARK_TEXT},co_rgb:${PUBLIC_WATERMARK_COLOR}/fl_layer_apply,y_${y}${x}`
+    );
+  }
+  return steps;
 }
 
 // Construye la URL publica con la marca quemada en los pixeles:
-// primero reduce, despues pixela los rostros detectados y encadena el
-// patron de texto repetido. Idempotente: si la URL ya trae una cadena de
-// transformaciones previa, la reemplaza en lugar de acumularla.
+// primero reduce y encadena el patron de texto repetido sobre toda la
+// imagen. Idempotente: si la URL ya trae una cadena de transformaciones
+// previa, la reemplaza en lugar de acumularla.
 export function buildPublicImageUrl(sourceUrl, maxWidth) {
   if (!sourceUrl || !sourceUrl.includes(CLOUDINARY_UPLOAD_MARKER)) return sourceUrl;
 
@@ -119,8 +133,7 @@ export function buildPublicImageUrl(sourceUrl, maxWidth) {
 
   const steps = [
     `f_auto,q_auto:good,w_${maxWidth},c_limit`,
-    "e_pixelate_faces:40",
-    ...buildWatermarkSteps(),
+    ...buildWatermarkSteps(maxWidth),
   ];
 
   return base + steps.join("/") + "/" + tail;
