@@ -510,6 +510,11 @@ export default function Portfolio() {
   }, []);
 
   const categories = useMemo(() => groupByCategoryAndEvent(images), [images]);
+
+  useEffect(() => {
+    const baseTitle = 'César Dario — Fotografía en Córdoba | Portfolio';
+    document.title = selectedCategory ? selectedCategory + ' — ' + baseTitle : baseTitle;
+  }, [selectedCategory]);
   const heroCoverImages = useMemo(() => {
     const covers = images.filter((image) => image.isCategoryCover && image.url);
     const uniqueCovers = [];
@@ -682,6 +687,7 @@ export default function Portfolio() {
 
   useEffect(() => {
     if (heroCarouselImages.length <= 1 || heroSlideState.animating) return undefined;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
 
     const intervalId = window.setInterval(() => {
       startHeroSlide();
@@ -689,6 +695,16 @@ export default function Portfolio() {
 
     return () => window.clearInterval(intervalId);
   }, [heroCarouselImages.length, heroSlideState.animating, startHeroSlide]);
+
+  const goToHeroSlide = (index) => {
+    if (heroSlideTimeoutRef.current) {
+      window.clearTimeout(heroSlideTimeoutRef.current);
+      heroSlideTimeoutRef.current = null;
+    }
+    heroCoverIndexRef.current = index;
+    setHeroCoverIndex(index);
+    setHeroSlideState({ animating: false, from: index, to: index });
+  };
 
   const closeModal = useCallback(() => {
     setModalIndex(null);
@@ -891,7 +907,6 @@ export default function Portfolio() {
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
         * { box-sizing: border-box; }
         body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -1122,7 +1137,6 @@ export default function Portfolio() {
         }
 
         .hero-copy {
-          animation: floatIn 320ms ease;
           text-align: left;
           max-width: 440px;
           align-self: start;
@@ -1147,10 +1161,12 @@ export default function Portfolio() {
         .hero h1 {
           margin: 0;
           max-width: none;
-          font-size: clamp(2.6rem, 6vw, 5.2rem);
-          line-height: 0.95;
-          letter-spacing: 0;
-          font-weight: 300;
+          font-family: 'Fraunces', Georgia, serif;
+          font-optical-sizing: auto;
+          font-size: clamp(2.4rem, 6vw, 5.4rem);
+          line-height: 1.02;
+          letter-spacing: -0.01em;
+          font-weight: 500;
         }
 
         .hero p {
@@ -1463,8 +1479,11 @@ export default function Portfolio() {
 
         .compact-copy h2 {
           margin: 0;
-          font-size: 1.28rem;
-          font-weight: 600;
+          font-family: 'Fraunces', Georgia, serif;
+          font-optical-sizing: auto;
+          font-size: clamp(1.3rem, 2vw, 1.7rem);
+          font-weight: 500;
+          letter-spacing: -0.01em;
         }
 
         .compact-copy p {
@@ -1538,11 +1557,11 @@ export default function Portfolio() {
         }
         .photo-card { border-radius: 20px; padding: 0; background: transparent; cursor: pointer; }
 
-        .category-card:hover,
+                .category-card:hover,
         .photo-card:hover {
-          transform: translateY(-4px);
-          border-color: rgba(255,255,255,0.14);
-          box-shadow: 0 30px 52px rgba(0,0,0,0.24);
+          transform: translateY(-8px);
+          border-color: rgba(240,212,155,0.38);
+          box-shadow: 0 34px 64px rgba(0,0,0,0.32), 0 12px 32px rgba(240,212,155,0.14);
         }
 
         .card-media {
@@ -1706,15 +1725,15 @@ export default function Portfolio() {
           align-items: flex-start;
           justify-content: center;
           padding: 22px;
-          background: rgba(0,0,0,0.88);
-          backdrop-filter: blur(8px);
+          background: rgba(0,0,0,0.82);
+          backdrop-filter: blur(16px) saturate(1.2);
           overflow-y: auto;
           overscroll-behavior: contain;
         }
 
         .modal-content {
           width: min(1260px, 96vw);
-          animation: modalIn 240ms ease;
+          animation: modalSpring 380ms cubic-bezier(0.16, 1, 0.3, 1);
           margin: auto 0;
         }
 
@@ -1841,8 +1860,10 @@ export default function Portfolio() {
 
         .modal-overview-title {
           margin: 0;
-          font-size: clamp(1.15rem, 2vw, 1.6rem);
-          font-weight: 700;
+          font-family: 'Fraunces', Georgia, serif;
+          font-optical-sizing: auto;
+          font-size: clamp(1.25rem, 2vw, 1.7rem);
+          font-weight: 600;
           color: #fff6ed;
         }
 
@@ -1875,10 +1896,10 @@ export default function Portfolio() {
           transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
         }
 
-        .modal-overview-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.26);
-          border-color: rgba(246,211,106,0.32);
+                .modal-overview-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 24px 48px rgba(0,0,0,0.3), 0 10px 28px rgba(246,211,106,0.16);
+          border-color: rgba(246,211,106,0.55);
         }
 
         .modal-overview-card.active {
@@ -2013,7 +2034,8 @@ export default function Portfolio() {
           flex-wrap: wrap;
           padding: 24px 28px 30px;
           color: rgba(245,241,234,0.48);
-          border-top: 1px solid rgba(255,255,255,0.06);
+          border-top: 1px solid transparent;
+          border-image: linear-gradient(90deg, transparent, rgba(240,212,155,0.45), transparent) 1;
         }
 
         .footer-socials {
@@ -2175,6 +2197,128 @@ export default function Portfolio() {
             justify-content: flex-start;
           }
         }
+      
+        /* ---- Rediseno visual 2026 ---- */
+        @keyframes heroRise {
+          from { opacity: 0; transform: translateY(22px); }
+          to { opacity: 1; transform: none; }
+        }
+
+        .hero-copy > * {
+          animation: heroRise 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .hero-copy > :nth-child(2) { animation-delay: 90ms; }
+        .hero-copy > :nth-child(3) { animation-delay: 180ms; }
+
+        /* Grano de pelicula sutil */
+        body::after {
+          content: "";
+          position: fixed;
+          inset: 0;
+          z-index: 40;
+          pointer-events: none;
+          opacity: 0.05;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+          background-size: 160px 160px;
+        }
+
+        /* Puntos del carrusel del hero */
+        .hero-dots {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding-bottom: 4px;
+        }
+
+        .hero-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 999px;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          background: rgba(245,241,234,0.25);
+          transition: width 300ms ease, background 300ms ease;
+        }
+
+        .hero-dot:hover { background: rgba(245,241,234,0.5); }
+
+        .hero-dot.is-active {
+          width: 28px;
+          background: linear-gradient(90deg, #f0d49b, #d59f1f);
+        }
+
+        /* Entrada del modal con spring */
+        @keyframes modalSpring {
+          from { opacity: 0; transform: translateY(16px) scale(0.98); }
+          to { opacity: 1; transform: none; }
+        }
+
+        .modal-close {
+          transition: transform 300ms ease, background 300ms ease;
+        }
+
+        .modal-close:hover { transform: rotate(90deg); }
+
+        /* Pop al marcar foto */
+        @keyframes selectPop {
+          0% { transform: scale(0.6); }
+          60% { transform: scale(1.25); }
+          100% { transform: scale(1); }
+        }
+
+        .modal-select.active .modal-select-mark {
+          animation: selectPop 320ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Boton principal con glow */
+        .request-button {
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24), 0 6px 22px rgba(31, 107, 79, 0.32);
+        }
+
+        .request-button:hover:not(:disabled) {
+          transform: translateY(-3px);
+          box-shadow:
+            0 22px 46px rgba(0, 0, 0, 0.3),
+            0 10px 30px rgba(31, 107, 79, 0.48),
+            0 0 0 1px rgba(121, 217, 173, 0.32);
+        }
+
+        /* Scrollbar acorde al tema */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #8d672d, #4a3a1c);
+          border-radius: 999px;
+        }
+
+        /* Reveal al hacer scroll (solo si el browser lo soporta) */
+        @supports (animation-timeline: view()) {
+          @keyframes cardReveal {
+            from { opacity: 0; translate: 0 28px; }
+            to { opacity: 1; translate: 0 0; }
+          }
+
+          .category-card,
+          .photo-card {
+            animation: cardReveal 600ms cubic-bezier(0.16, 1, 0.3, 1);
+            animation-timeline: view();
+            animation-range: entry 0% cover 20%;
+          }
+        }
+
+        /* Respetar prefers-reduced-motion */
+        @media (prefers-reduced-motion: reduce) {
+          html { scroll-behavior: auto; }
+          *,
+          *::before,
+          *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
       `}</style>
 
       <div className="portfolio-shell">
@@ -2268,7 +2412,7 @@ export default function Portfolio() {
           <header className="hero" id="portfolio">
             <div className="hero-copy">
               <div className="eyebrow">Portfolio</div>
-              {visibleName ? <h1>{visibleName}</h1> : null}
+              <h1>{adminName || 'César Dario'}</h1>
               <p>
                 Fotografia de eventos, retratos y escenas en vivo. Trabajo en bodas, 15 años,
                 books, paisajes, playa, recitales, cuarteto, boliches y proyectos visuales de
@@ -2357,6 +2501,21 @@ export default function Portfolio() {
                   <div className="hero-stage-kicker">Portada seleccionada</div>
                     <strong>{heroCurrentImage.label || heroCurrentImage.category || 'Portada'}</strong>
                   </div>
+                  {heroCarouselImages.length > 1 ? (
+                    <div className="hero-dots" role="tablist" aria-label="Portadas">
+                      {heroCarouselImages.map((image, dotIndex) => (
+                        <button
+                          key={image.id}
+                          type="button"
+                          role="tab"
+                          aria-selected={dotIndex === heroCarouselCurrentIndex}
+                          aria-label={'Portada ' + (dotIndex + 1)}
+                          className={'hero-dot' + (dotIndex === heroCarouselCurrentIndex ? ' is-active' : '')}
+                          onClick={() => goToHeroSlide(dotIndex)}
+                        />
+                      ))}
+                    </div>
+                  ) : null}
                   <div className="hero-stage-meta">
                     <span>{heroCategoryOptions.find((option) => option.key === heroCategoryKey)?.label || heroCurrentImage.category || 'General'}</span>
                     <span>
@@ -2598,7 +2757,7 @@ export default function Portfolio() {
 
           <footer className="footer">
             <div>
-              {visibleName ? <div style={{ fontWeight: 600, color: '#fff6ed' }}>{visibleName}</div> : null}
+              {<div style={{ fontWeight: 600, color: '#fff6ed' }}>{adminName || 'César Dario'}</div>}
               <div style={{ marginTop: '6px' }}>
                 Fotografia para eventos, retratos y proyectos visuales.
               </div>

@@ -1,0 +1,18 @@
+{
+  "name": "César Dario — Fotografía en Córdoba",
+  "short_name": "César Dario",
+  "description": "Portfolio de fotografía de eventos, retratos y escenas en vivo.",
+  "lang": "es-AR",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
