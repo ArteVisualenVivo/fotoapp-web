@@ -8,6 +8,7 @@ const DEFAULT_LOCATION = 'Cordoba, Argentina';
 const DEFAULT_PRICING_TITLE = 'Servicios y precios';
 const DEFAULT_PRICING_BODY =
   'Sesiones personalizadas, cobertura de eventos y entregas editadas. Consulta disponibilidad y presupuesto segun tu proyecto.';
+const MODAL_BLUR = 'blur(2px)';
 const MOBILE_BREAKPOINT = '(max-width: 780px)';
 const PRICE_FORMATTER = new Intl.NumberFormat('es-AR', {
   maximumFractionDigits: 0,
@@ -1891,6 +1892,7 @@ export default function Portfolio() {
           object-fit: cover;
           display: block;
           background: rgba(255,255,255,0.05);
+          filter: blur(1.2px);
         }
 
         .modal-overview-card-index {
@@ -2671,6 +2673,7 @@ export default function Portfolio() {
                   alt={modalImage.label || 'Imagen del portfolio'}
                   onContextMenu={blockImageInteraction}
                   onDragStart={blockImageInteraction}
+                  style={{ filter: MODAL_BLUR }}
                 />
 
                 <button
