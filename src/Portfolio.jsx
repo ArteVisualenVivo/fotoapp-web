@@ -8,8 +8,6 @@ const DEFAULT_LOCATION = 'Cordoba, Argentina';
 const DEFAULT_PRICING_TITLE = 'Servicios y precios';
 const DEFAULT_PRICING_BODY =
   'Sesiones personalizadas, cobertura de eventos y entregas editadas. Consulta disponibilidad y presupuesto segun tu proyecto.';
-const WATERMARK_TEXT = 'cesardarioph';
-const MODAL_BLUR = 'blur(2px)';
 const MOBILE_BREAKPOINT = '(max-width: 780px)';
 const PRICE_FORMATTER = new Intl.NumberFormat('es-AR', {
   maximumFractionDigits: 0,
@@ -1738,23 +1736,6 @@ export default function Portfolio() {
           display: block;
         }
 
-        .watermark-center {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 2;
-          font-size: clamp(1.15rem, 3.3vw, 2.8rem);
-          font-weight: 800;
-          letter-spacing: 0.32em;
-          color: rgba(255,255,255,0.18);
-          text-shadow: 0 2px 12px rgba(0,0,0,0.36);
-          pointer-events: none;
-          user-select: none;
-          transform: rotate(-18deg);
-        }
-
         .modal-nav,
         .modal-close,
         .modal-select {
@@ -1910,24 +1891,6 @@ export default function Portfolio() {
           object-fit: cover;
           display: block;
           background: rgba(255,255,255,0.05);
-          filter: blur(1.2px);
-        }
-
-        .modal-overview-card-watermark {
-          position: absolute;
-          inset: 0 0 38px 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 2;
-          font-size: 0.72rem;
-          font-weight: 800;
-          letter-spacing: 0.28em;
-          color: rgba(255,255,255,0.85);
-          text-shadow: 0 1px 8px rgba(0,0,0,0.7);
-          pointer-events: none;
-          user-select: none;
-          transform: rotate(-18deg);
         }
 
         .modal-overview-card-index {
@@ -2691,7 +2654,6 @@ export default function Portfolio() {
                             onError={() => handleImageError(image.url)}
                           />
                           <span className="modal-overview-card-index">{index + 1}</span>
-                          <span className="modal-overview-card-watermark">{WATERMARK_TEXT}</span>
                           <div className="modal-overview-card-label">
                             {image.label || `Foto ${index + 1}`}
                           </div>
@@ -2709,10 +2671,7 @@ export default function Portfolio() {
                   alt={modalImage.label || 'Imagen del portfolio'}
                   onContextMenu={blockImageInteraction}
                   onDragStart={blockImageInteraction}
-                  style={{ filter: MODAL_BLUR }}
                 />
-
-                <span className="watermark-center">{WATERMARK_TEXT}</span>
 
                 <button
                   type="button"

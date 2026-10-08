@@ -103,7 +103,7 @@ function buildWatermarkSteps(maxWidth) {
   for (let y = -range; y <= range; y += spacing, index += 1) {
     const x = index % 2 === 0 ? "" : ",x_90";
     steps.push(
-      `l_text:Arial_${fontSize}_bold:${PUBLIC_WATERMARK_TEXT},co_rgb:${PUBLIC_WATERMARK_COLOR}/fl_layer_apply,y_${y}${x}`
+      `l_text:Arial_${fontSize}_bold:${PUBLIC_WATERMARK_TEXT},co_rgb:${PUBLIC_WATERMARK_COLOR}/fl_layer_apply,fl_no_overflow,y_${y}${x}`
     );
   }
   return steps;
