@@ -1401,6 +1401,22 @@ export default function Portfolio({ mode = 'gallery' }) {
         .contact-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
         .contact-actions .request-button, .contact-actions .ghost-button { flex:1 1 0; }
         .contact-mini { margin-top:12px; color:rgba(243,239,230,0.46); font-size:0.8rem; line-height:1.5; }
+
+        /* ===== TIENDA (modo shop): blur anti-robo en imagen grande y miniaturas ===== */
+        /* Solo aplica dentro de .portfolio-shell.is-shop; el portfolio queda limpio. */
+        .portfolio-shell.is-shop .modal-image { filter: blur(4px); }
+        .portfolio-shell.is-shop .modal-overview-card img { filter: blur(3px); }
+        .portfolio-shell.is-shop .card-media img { filter: blur(3px); }
+        .portfolio-shell.is-shop .hero-carousel-card img { filter: blur(7px) brightness(0.94) !important; }
+        .portfolio-shell.is-shop .thumb-button img { filter: blur(3px); }
+        .portfolio-shell.is-shop .hero-carousel-card { position:relative; }
+        .shop-hero-watermark {
+          position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+          text-align:center; padding:0 12px; pointer-events:none; user-select:none; z-index:2;
+          font-weight:800; letter-spacing:0.28em; text-transform:lowercase;
+          font-size:clamp(1rem,2.6vw,1.6rem); color:rgba(255,255,255,0.9);
+          text-shadow:0 1px 10px rgba(0,0,0,0.8); transform:rotate(-18deg);
+        }
         `}</style>
 
       <div className={'portfolio-shell' + (isShop ? ' is-shop' : '')}>
@@ -1549,6 +1565,9 @@ export default function Portfolio({ mode = 'gallery' }) {
                           onDragStart={blockImageInteraction}
                           onError={() => handleImageError(heroCurrentImage.url)}
                         />
+                        {isShop && (
+                          <span className="shop-hero-watermark" aria-hidden="true">cesardarioph</span>
+                        )}
                       </div>
                     </div>
                     {heroCarouselImages.length > 1 && heroNextImage?.url ? (
