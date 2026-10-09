@@ -291,6 +291,7 @@ export default function Admin() {
   const [savingSettings, setSavingSettings] = useState(false);
   const [updatingImageId, setUpdatingImageId] = useState(null);
   const [bulkUpdating, setBulkUpdating] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [expandedAlbumKey, setExpandedAlbumKey] = useState(null);
   const [previewIndex, setPreviewIndex] = useState(null);
@@ -788,11 +789,13 @@ export default function Admin() {
   const openAlbum = (albumKey) => {
     setExpandedAlbumKey(albumKey);
     setPreviewIndex(null);
+    setSelectedIds([]);
   };
 
   const returnToAlbumBrowser = () => {
     setExpandedAlbumKey(null);
     setPreviewIndex(null);
+    setSelectedIds([]);
   };
 
   const deleteAlbumAssetInCloudinary = async (publicId, idToken) => {
@@ -1040,6 +1043,48 @@ export default function Admin() {
     }
   };
 
+  const toggleSelectImage = (id) => {
+    if (!id) return;
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+  };
+
+  const clearSelection = () => setSelectedIds([]);
+
+  const selectAllInAlbum = (targetImages) => {
+    if (!targetImages) return;
+    setSelectedIds(targetImages.map((image) => image.id));
+  };
+
+  const applyToSelection = async (updates, confirmMessage, successMessage) => {
+    const ids = selectedIds.filter(Boolean);
+    if (ids.length === 0) {
+      window.alert('Selecciona al menos una foto primero.');
+      return;
+    }
+    const confirmed = window.confirm(confirmMessage.replace('{n}', String(ids.length)));
+    if (!confirmed) return;
+    setBulkUpdating(true);
+    setUploadStatus(null);
+    try {
+      getAuthenticatedUser();
+      await Promise.all(
+        ids.map((id) => updateDoc(doc(getPhotosCollection(), id), updates))
+      );
+      await loadAdminData();
+      clearSelection();
+      setUploadStatus({ type: 'success', message: successMessage.replace('{n}', String(ids.length)) });
+      setTimeout(() => setUploadStatus(null), 2500);
+    } catch (error) {
+      setUploadStatus({
+        type: 'error',
+        message: 'No se pudo aplicar el cambio a las seleccionadas.',
+        details: [error.message],
+      });
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
   const deleteImage = async (targetImage, options = {}) => {
     if (!targetImage?.id) return;
 
@@ -1176,6 +1221,42 @@ export default function Admin() {
           font-size: 0.85rem;
           font-weight: 600;
         }
+        .admin-batch-bar {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+          margin: 12px 0;
+          padding: 10px 12px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+        }
+        .admin-batch-btn {
+          border: 1px solid #cbd5e1;
+          border-radius: 999px;
+          padding: 6px 10px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          cursor: pointer;
+          background: #fff;
+        }
+        .admin-batch-btn.primary { background: #0ea5e9; color: #fff; border: none; }
+        .admin-batch-btn.danger { background: #16a34a; color: #fff; border: none; }
+        .admin-batch-btn.sale { background: #2563eb; color: #fff; border: none; }
+        .admin-batch-btn.muted { background: #6b7280; color: #fff; border: none; }
+        .admin-select-row {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 8px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          cursor: pointer;
+          background: #f8fafc;
+        }
+        .admin-image-card[data-sel='1'] { outline: 3px solid #0ea5e9; border-radius: 12px; }
+        .admin-image-card[data-sel='1'] .admin-select-row { background: #e0f2fe; }
         .admin-images-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -2111,10 +2192,39 @@ export default function Admin() {
                     )}
                   </div>
                 </div>
+                <div className="admin-batch-bar">
+                  <span style={{ fontSize: '0.85rem', fontWeight: '700' }}>{selectedIds.length} seleccionada(s)</span>
+                  <button type="button" className="admin-batch-btn" onClick={() => selectAllInAlbum(activeAlbumGroup.images)} disabled={bulkUpdating}>
+                    Seleccionar todas
+                  </button>
+                  <button type="button" className="admin-batch-btn" onClick={clearSelection} disabled={bulkUpdating || selectedIds.length === 0}>
+                    Limpiar
+                  </button>
+                  <button type="button" className="admin-batch-btn primary" onClick={() => applyToSelection({ isPortfolio: true }, 'Mostrar en portfolio {n} foto(s)?', '{n} mostrada(s).')} disabled={bulkUpdating || selectedIds.length === 0}>
+                    Mostrar sel. portfolio
+                  </button>
+                  <button type="button" className="admin-batch-btn danger" onClick={() => applyToSelection({ isPortfolio: false }, 'Quitar del portfolio {n} foto(s)?', '{n} quitada(s).')} disabled={bulkUpdating || selectedIds.length === 0}>
+                    Quitar sel. portfolio
+                  </button>
+                  <button type="button" className="admin-batch-btn sale" onClick={() => applyToSelection({ isForSale: true }, 'Poner en venta {n} foto(s)?', '{n} en venta.')} disabled={bulkUpdating || selectedIds.length === 0}>
+                    Poner sel. en venta
+                  </button>
+                  <button type="button" className="admin-batch-btn muted" onClick={() => applyToSelection({ isForSale: false }, 'Quitar de venta {n} foto(s)?', '{n} fuera de venta.')} disabled={bulkUpdating || selectedIds.length === 0}>
+                    Quitar sel. de venta
+                  </button>
+                </div>
 
                 <div className="admin-images-grid">
                   {activeAlbumGroup.images.map((img) => (
-                    <div key={img.id} className="admin-image-card">
+                    <div key={img.id} className="admin-image-card" data-sel={selectedIds.includes(img.id) ? '1' : '0'}>
+                      <label className="admin-select-row">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(img.id)}
+                          onChange={() => toggleSelectImage(img.id)}
+                        />
+                        Seleccionar
+                      </label>
                       <button
                         type="button"
                         className="admin-image-preview-button"
