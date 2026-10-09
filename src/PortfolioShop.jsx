@@ -1183,6 +1183,17 @@ export default function Portfolio() {
         .hero-copy {
           text-align: left;
           max-width: 440px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .hero-amp { color: rgba(245,241,234,0.55); font-weight: 300; }
+        .hero-alias {
+          font-size: 0.52em; letter-spacing: 0; color: #f0d49b; text-decoration: none;
+          border-bottom: 1px solid rgba(240,212,155,0.45); white-space: nowrap;
+        }
+        .hero-alias:hover { color: #fff3d9; border-color: #f0d49b; }
           align-self: start;
           padding-top: clamp(6px, 0.6vw, 12px);
         }
@@ -2457,7 +2468,7 @@ export default function Portfolio() {
           <header className="hero" id="portfolio">
             <div className="hero-copy">
               <div className="eyebrow">Portfolio</div>
-              <h1>{adminName || 'César Dario'}</h1>
+              <h1>{adminName || 'César Dario'} <span className="hero-amp">&</span> <a className="hero-alias" href="https://www.instagram.com/artevisualenvivo?utm_source=qr&igsh=NndiZG05czlnZ2Vs" target="_blank" rel="noreferrer">ArteVisualenVivo</a></h1>
               <p>
                 Fotografia de eventos, retratos y escenas en vivo. Trabajo en bodas, 15 años,
                 books, paisajes, playa, recitales, cuarteto, boliches y proyectos visuales de

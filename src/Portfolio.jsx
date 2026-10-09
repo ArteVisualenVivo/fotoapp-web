@@ -1115,6 +1115,12 @@ export default function Portfolio({ mode = 'gallery' }) {
           margin:0; font-family:'Fraunces',Georgia,serif; font-optical-sizing:auto; font-weight:400;
           font-size:clamp(2.8rem,7vw,5.6rem); line-height:1; letter-spacing:-0.02em; color:#f3efe6;
         }
+        .hero-amp { color:rgba(243,239,230,0.55); font-weight:300; }
+        .hero-alias {
+          font-size:0.52em; letter-spacing:0; color:#c9a86a; text-decoration:none;
+          border-bottom:1px solid rgba(201,168,106,0.45); white-space:nowrap;
+        }
+        .hero-alias:hover { color:#e9d9b6; border-color:#c9a86a; }
         .hero p {
           max-width:40ch; margin:24px 0 0; color:rgba(243,239,230,0.62);
           font-size:1rem; line-height:1.85; font-weight:300;
@@ -1489,7 +1495,7 @@ export default function Portfolio({ mode = 'gallery' }) {
           <header className="hero" id="portfolio">
             <div className="hero-copy">
               <div className="eyebrow">{isShop ? 'Tienda' : 'Portfolio'}</div>
-              <h1>{isShop ? 'Comprar fotos' : (adminName || 'César Dario')}</h1>
+              <h1>{isShop ? 'Comprar fotos' : (<>{adminName || 'César Dario'} <span className="hero-amp">&</span> <a className="hero-alias" href="https://www.instagram.com/artevisualenvivo?utm_source=qr&igsh=NndiZG05czlnZ2Vs" target="_blank" rel="noreferrer">ArteVisualenVivo</a></>)}</h1>
               <p>
                 {isShop
                   ? 'Elegi tus fotos favoritas, marcalas y pedilas por WhatsApp. Los precios se calculan solos a medida que seleccionas.'
@@ -1510,11 +1516,6 @@ export default function Portfolio({ mode = 'gallery' }) {
                     <span>Enviá tu selección por WhatsApp y cerramos el pedido.</span>
                   </div>
                 </div>
-              )}
-              {!isShop && (
-                <Link to="/tienda" className="request-button shop-hero-cta">
-                  Comprar fotos
-                </Link>
               )}
             </div>
 
