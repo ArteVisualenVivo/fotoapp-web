@@ -1235,12 +1235,14 @@ export default function Admin() {
         .admin-batch-btn {
           border: 1px solid #cbd5e1;
           border-radius: 999px;
-          padding: 6px 10px;
+          padding: 6px 12px;
           font-size: 0.75rem;
           font-weight: 700;
           cursor: pointer;
           background: #fff;
+          color: #0f172a;
         }
+        .admin-batch-btn:disabled { opacity: 0.45; cursor: not-allowed; }
         .admin-batch-btn.primary { background: #0ea5e9; color: #fff; border: none; }
         .admin-batch-btn.danger { background: #16a34a; color: #fff; border: none; }
         .admin-batch-btn.sale { background: #2563eb; color: #fff; border: none; }
