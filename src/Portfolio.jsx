@@ -10,7 +10,6 @@ const DEFAULT_PRICING_TITLE = 'Servicios y precios';
 const DEFAULT_PRICING_BODY =
   'Sesiones personalizadas, cobertura de eventos y entregas editadas. Consulta disponibilidad y presupuesto segun tu proyecto.';
 const PORTFOLIO_VACIO = false;
-const MODAL_BLUR = 'blur(2px)';
 const MOBILE_BREAKPOINT = '(max-width: 780px)';
 const PRICE_FORMATTER = new Intl.NumberFormat('es-AR', {
   maximumFractionDigits: 0,
@@ -1261,7 +1260,7 @@ export default function Portfolio({ mode = 'gallery' }) {
         .modal-overview-card.active { border-color:rgba(201,168,106,0.82); box-shadow:0 0 0 2px rgba(201,168,106,0.2); }
         .modal-overview-card img {
           width:100%; height:180px; object-fit:cover; display:block;
-          background:rgba(255,255,255,0.05); filter:blur(1.2px);
+          background:rgba(255,255,255,0.05);
         }
         .modal-overview-card-index {
           position:absolute; top:10px; left:10px; min-width:28px; height:28px; padding:0 8px; border-radius:2px;
@@ -1342,7 +1341,7 @@ export default function Portfolio({ mode = 'gallery' }) {
 
         .thumb-button.active { border-color:rgba(201,168,106,0.8); box-shadow:0 0 0 2px rgba(201,168,106,0.18); }
         .thumb-button:not(.active):hover { transform:translateY(-1px); border-color:rgba(243,239,230,0.2); }
-        .thumb-button img { width:100%; height:100%; object-fit:cover; display:block; filter:blur(1.2px); }
+        .thumb-button img { width:100%; height:100%; object-fit:cover; display:block; }
 
         .footer-copy {
           color:rgba(243,239,230,0.5); font-size:0.86rem; line-height:1.6;
@@ -1930,7 +1929,6 @@ export default function Portfolio({ mode = 'gallery' }) {
                   alt={modalImage.label || 'Imagen del portfolio'}
                   onContextMenu={blockImageInteraction}
                   onDragStart={blockImageInteraction}
-                  style={{ filter: MODAL_BLUR }}
                 />
 
                 {isShop && (

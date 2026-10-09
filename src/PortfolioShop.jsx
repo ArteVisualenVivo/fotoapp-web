@@ -2004,6 +2004,7 @@ export default function Portfolio() {
           height: 100%;
           object-fit: cover;
           display: block;
+          filter: blur(1.2px);
         }
 
         .badge {
