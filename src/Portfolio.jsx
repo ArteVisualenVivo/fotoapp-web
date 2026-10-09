@@ -80,9 +80,10 @@ function getPricingPlanKind(plan) {
   if (!label) return 'coverage';
   if (label === 'individual' || label.includes('individual')) return 'individual';
   if (label.includes('pack')) return 'pack';
-  if (label.includes('cobertur')) return 'coverage';
-
-  return 'coverage';
+  if (label.includes('cobertur') || label.includes('cobertura') || label.includes('coverage')) return 'coverage';
+  const packHint = Number(plan && (plan.packSize || plan.bundleSize || plan.minPhotos || plan.maxPhotos));
+  if (Number.isFinite(packHint) && packHint > 1) return 'pack';
+  return 'individual';
 }
 
 function getPricingPlanSize(plan) {
@@ -238,6 +239,28 @@ function buildPricingSummaryText(recommendation) {
   return recommendation.selectedPlans
     .map((plan) => `${plan.count} x ${formatPricingPlanName(plan)}`)
     .join(' + ');
+}
+
+function buildFallbackPricing(selectedCount, catalog) {
+  if (!(selectedCount > 0) || !Array.isArray(catalog) || catalog.length === 0) return null;
+  const cheapest = chooseLowestPricePlan(catalog);
+  if (!cheapest || !Number.isFinite(cheapest.amount) || cheapest.amount <= 0) return null;
+  return {
+    selectedCount,
+    estimatedTotal: cheapest.amount * selectedCount,
+    individualBase: cheapest.amount * selectedCount,
+    savings: 0,
+    selectedPlans: [
+      {
+        key: cheapest.id || 'fallback',
+        label: cheapest.label,
+        amount: cheapest.amount,
+        size: 1,
+        count: selectedCount,
+        source: cheapest,
+      },
+    ],
+  };
 }
 
 function parseAlbumLabel(label) {
@@ -628,10 +651,13 @@ export default function Portfolio({ mode = 'gallery' }) {
   const pricingRecommendation = useMemo(() => {
     const individualPlan =
       pricingPlanCatalog.find((plan) => plan.kind === 'individual') ||
-      chooseLowestPricePlan(pricingPlanCatalog.filter((plan) => plan.size === 1));
+      chooseLowestPricePlan(pricingPlanCatalog.filter((plan) => !plan.packSize || plan.packSize === 1));
     const packPlans = pricingPlanCatalog.filter((plan) => plan.kind === 'pack' && plan.packSize > 0);
 
-    return buildPricingRecommendation(selectedPhotoIds.length, individualPlan, packPlans);
+    return (
+      buildPricingRecommendation(selectedPhotoIds.length, individualPlan, packPlans) ||
+      buildFallbackPricing(selectedPhotoIds.length, pricingPlanCatalog)
+    );
   }, [pricingPlanCatalog, selectedPhotoIds.length]);
   const pricingSummaryText = useMemo(
     () => buildPricingSummaryText(pricingRecommendation),
@@ -895,9 +921,11 @@ export default function Portfolio({ mode = 'gallery' }) {
     const cleanNumber = whatsAppNumber.replace(/\D/g, '');
     const categoryList = [...new Set(requestedImages.map((image) => image.category || 'General'))];
     const eventList = [...new Set(requestedImages.map((image) => image.label?.trim()).filter(Boolean))];
-    const rqIndPlan = pricingPlanCatalog.find((qq) => qq.kind === 'individual') || chooseLowestPricePlan(pricingPlanCatalog.filter((qq) => qq.size === 1));
+    const rqIndPlan = pricingPlanCatalog.find((qq) => qq.kind === 'individual') || chooseLowestPricePlan(pricingPlanCatalog.filter((qq) => !qq.packSize || qq.packSize === 1));
     const rqPackPlans = pricingPlanCatalog.filter((qq) => qq.kind === 'pack' && qq.packSize > 0);
-    const rqPricing = buildPricingRecommendation(requestedImages.length, rqIndPlan, rqPackPlans);
+    const rqPricing =
+      buildPricingRecommendation(requestedImages.length, rqIndPlan, rqPackPlans) ||
+      buildFallbackPricing(requestedImages.length, pricingPlanCatalog);
     const rqDetail = buildPricingSummaryText(rqPricing);
     const rqTotal = rqPricing ? formatMoney(rqPricing.estimatedTotal) : '';
     const messageLines = [
@@ -906,7 +934,7 @@ export default function Portfolio({ mode = 'gallery' }) {
       `Categorias: ${categoryList.join(', ')}`,
       ...(eventList.length > 0 ? [`Eventos: ${eventList.join(', ')}`] : []),
       `Cantidad: ${requestedImages.length} foto(s)`,
-      ...(rqTotal ? [`Total estimado: ${rqTotal}`] : []),
+      ...(rqTotal ? [`Total estimado: ${rqTotal}`] : [`Total: a consultar por WhatsApp`]),
       ...(rqDetail ? [`Detalle: ${rqDetail}`] : []),
       '',
       ...requestedImages.flatMap((image, index) => [
