@@ -1357,6 +1357,7 @@ export default function Portfolio() {
           object-fit: cover;
           object-position: center center;
           display: block;
+          filter: blur(1.2px);
         }
 
         .hero-carousel-slide.is-prev .hero-carousel-card,
@@ -1633,6 +1634,7 @@ export default function Portfolio() {
           object-fit: cover;
           display: block;
           transition: transform 260ms ease;
+          filter: blur(1.2px);
         }
 
         .category-card:hover .card-media img,
