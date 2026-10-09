@@ -2468,7 +2468,7 @@ export default function Portfolio() {
           <header className="hero" id="portfolio">
             <div className="hero-copy">
               <div className="eyebrow">Portfolio</div>
-              <h1>{adminName || 'César Dario'} <span className="hero-amp">&</span> <a className="hero-alias" href="https://www.instagram.com/artevisualenvivo?utm_source=qr&igsh=NndiZG05czlnZ2Vs" target="_blank" rel="noreferrer">ArteVisualenVivo</a></h1>
+              <h1>{adminName || 'César Dario'}</h1>
               <p>
                 Fotografia de eventos, retratos y escenas en vivo. Trabajo en bodas, 15 años,
                 books, paisajes, playa, recitales, cuarteto, boliches y proyectos visuales de
