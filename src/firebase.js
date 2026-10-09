@@ -59,6 +59,14 @@ export function getPublicPhotosQuery() {
   return query(getPhotosCollection(), where("isPortfolio", "==", true));
 }
 
+// Tienda: trae todas las fotos. El filtro "en venta" se aplica en el cliente
+// (isForSale !== false) para que las fotos ya subidas, que aun no tienen el
+// campo, sigan apareciendo en la tienda hasta que se las marque como "no en venta".
+export function getShopPhotosQuery() {
+  return getPhotosCollection();
+}
+
+
 export function normalizeLabel(input) {
   const raw = `${input ?? ""}`.normalize("NFKC");
   const segments = raw
@@ -139,6 +147,28 @@ export function buildPublicImageUrl(sourceUrl, maxWidth) {
   return base + steps.join("/") + "/" + tail;
 }
 
+// URL limpia, SIN marca de agua: solo optimiza (calidad y ancho). La usa el
+// PORTFOLIO (gallery), que muestra trabajo artistico y no esta a la venta.
+export function buildCleanImageUrl(sourceUrl, maxWidth) {
+  if (!sourceUrl || !sourceUrl.includes(CLOUDINARY_UPLOAD_MARKER)) return sourceUrl;
+
+  const markerIndex = sourceUrl.indexOf(CLOUDINARY_UPLOAD_MARKER);
+  const base = sourceUrl.slice(0, markerIndex + CLOUDINARY_UPLOAD_MARKER.length);
+  let tail = sourceUrl.slice(markerIndex + CLOUDINARY_UPLOAD_MARKER.length);
+  const isTransformStep = (segment) =>
+    segment.includes(",") ||
+    segment.includes(":") ||
+    /^(fl_|l_|e_|w_|h_|c_|f_|q_|dpr_|g_|b_|x_|y_|a_|opacity_|co_|bo_|ar_|t_|d_)/.test(segment);
+  const segments = tail.split("/");
+  let cleaned = segments;
+  while (cleaned.length > 1 && isTransformStep(cleaned[0])) {
+    cleaned = cleaned.slice(1);
+  }
+  tail = cleaned.join("/");
+
+  return `${base}f_auto,q_auto:good,w_${maxWidth},c_limit/${tail}`;
+}
+
 export function normalizePhoto(docId, data) {
   const resolvedUrl =
     data.optimizedUrl ||
@@ -159,6 +189,10 @@ export function normalizePhoto(docId, data) {
   const baseUrl = originalUrl || resolvedUrl;
   const optimizedUrl = buildPublicImageUrl(baseUrl, 1400) || resolvedUrl;
   const thumbUrl = buildPublicImageUrl(baseUrl, 600) || optimizedUrl;
+  // Versiones LIMPIAS (sin marca de agua) para el portfolio artistico.
+  // Anchos moderados: livianos de cargar pero nítidos en pantalla.
+  const cleanUrl = buildCleanImageUrl(baseUrl, 900) || resolvedUrl;
+  const cleanThumbUrl = buildCleanImageUrl(baseUrl, 400) || cleanUrl;
 
   return {
     id: docId,
@@ -167,6 +201,8 @@ export function normalizePhoto(docId, data) {
     originalUrl,
     optimizedUrl,
     thumbUrl,
+    cleanUrl,
+    cleanThumbUrl,
     url: optimizedUrl || resolvedUrl,
     imageUrl: optimizedUrl || resolvedUrl,
   };

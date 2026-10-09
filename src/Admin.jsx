@@ -272,6 +272,7 @@ export default function Admin() {
   const [categoryPreset, setCategoryPreset] = useState(CATEGORY_OPTIONS[0]);
   const [customCategory, setCustomCategory] = useState('');
   const [isPortfolio, setIsPortfolio] = useState(true);
+  const [isForSale, setIsForSale] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isCategoryCover, setIsCategoryCover] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -289,6 +290,7 @@ export default function Admin() {
   const [servicePlans, setServicePlans] = useState([createEmptyServicePlan()]);
   const [savingSettings, setSavingSettings] = useState(false);
   const [updatingImageId, setUpdatingImageId] = useState(null);
+  const [bulkUpdating, setBulkUpdating] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [expandedAlbumKey, setExpandedAlbumKey] = useState(null);
   const [previewIndex, setPreviewIndex] = useState(null);
@@ -670,6 +672,7 @@ export default function Admin() {
         label: normalizeLabel(label),
         category: resolvedCategory,
         isPortfolio,
+        isForSale,
         isFeatured,
         isCategoryCover,
         uploadedBy: currentUser.uid,
@@ -882,6 +885,158 @@ export default function Admin() {
       });
     } finally {
       setUpdatingImageId(null);
+    }
+  };
+
+  const togglePortfolioImage = async (targetImage) => {
+    if (!targetImage?.id) return;
+
+    setUpdatingImageId(targetImage.id);
+    setUploadStatus(null);
+
+    try {
+      getAuthenticatedUser();
+      await updateDoc(doc(getPhotosCollection(), targetImage.id), {
+        isPortfolio: !targetImage.isPortfolio,
+      });
+      await loadAdminData();
+    } catch (error) {
+      setUploadStatus({
+        type: 'error',
+        message: 'No se pudo actualizar la visibilidad del portfolio.',
+        details: [error.message],
+      });
+    } finally {
+      setUpdatingImageId(null);
+    }
+  };
+
+  const toggleForSaleImage = async (targetImage) => {
+    if (!targetImage?.id) return;
+
+    setUpdatingImageId(targetImage.id);
+    setUploadStatus(null);
+
+    try {
+      getAuthenticatedUser();
+      await updateDoc(doc(getPhotosCollection(), targetImage.id), {
+        isForSale: !targetImage.isForSale,
+      });
+      await loadAdminData();
+    } catch (error) {
+      setUploadStatus({
+        type: 'error',
+        message: 'No se pudo actualizar la disponibilidad de venta.',
+        details: [error.message],
+      });
+    } finally {
+      setUpdatingImageId(null);
+    }
+  };
+
+  const hideAllFromPortfolio = async (targetImages) => {
+    if (!targetImages || targetImages.length === 0) return;
+
+    const confirmed = window.confirm(
+      `Se van a quitar del portfolio ${targetImages.length} foto(s). No se borran, solo dejan de mostrarse en la web. Continuar?`
+    );
+    if (!confirmed) return;
+
+    setBulkUpdating(true);
+    setUploadStatus(null);
+
+    try {
+      getAuthenticatedUser();
+      await Promise.all(
+        targetImages.map((image) =>
+          updateDoc(doc(getPhotosCollection(), image.id), { isPortfolio: false })
+        )
+      );
+      await loadAdminData();
+      setUploadStatus({
+        type: 'success',
+        message: `${targetImages.length} foto(s) quitada(s) del portfolio.`,
+      });
+      setTimeout(() => setUploadStatus(null), 2500);
+    } catch (error) {
+      setUploadStatus({
+        type: 'error',
+        message: 'No se pudo quitar las fotos del portfolio.',
+        details: [error.message],
+      });
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
+  const showAllInPortfolio = async (targetImages) => {
+    if (!targetImages || targetImages.length === 0) return;
+
+    const confirmed = window.confirm(
+      `Se van a mostrar en el portfolio ${targetImages.length} foto(s). No se borran ni se toca la tienda. Continuar?`
+    );
+    if (!confirmed) return;
+
+    setBulkUpdating(true);
+    setUploadStatus(null);
+
+    try {
+      getAuthenticatedUser();
+      await Promise.all(
+        targetImages.map((image) =>
+          updateDoc(doc(getPhotosCollection(), image.id), { isPortfolio: true })
+        )
+      );
+      await loadAdminData();
+      setUploadStatus({
+        type: 'success',
+        message: `${targetImages.length} foto(s) mostrada(s) en el portfolio.`,
+      });
+      setTimeout(() => setUploadStatus(null), 2500);
+    } catch (error) {
+      setUploadStatus({
+        type: 'error',
+        message: 'No se pudo mostrar las fotos en el portfolio.',
+        details: [error.message],
+      });
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
+  const setAllForSale = async (targetImages, value) => {
+    if (!targetImages || targetImages.length === 0) return;
+
+    const accion = value ? 'poner en venta' : 'quitar de la venta';
+    const confirmed = window.confirm(
+      `Se van a ${accion} ${targetImages.length} foto(s) de la tienda. Continuar?`
+    );
+    if (!confirmed) return;
+
+    setBulkUpdating(true);
+    setUploadStatus(null);
+
+    try {
+      getAuthenticatedUser();
+      await Promise.all(
+        targetImages.map((image) =>
+          updateDoc(doc(getPhotosCollection(), image.id), { isForSale: value })
+        )
+      );
+      await loadAdminData();
+      setUploadStatus({
+        type: 'success',
+        message: `${targetImages.length} foto(s) actualizada(s) en la tienda.`,
+      });
+      setTimeout(() => setUploadStatus(null), 2500);
+    } catch (error) {
+      setUploadStatus({
+        type: 'error',
+        message: 'No se pudo actualizar la venta de las fotos.',
+        details: [error.message],
+      });
+    } finally {
+      setBulkUpdating(false);
     }
   };
 
@@ -1670,6 +1825,10 @@ export default function Admin() {
             <span>Portfolio (visible publicamente)</span>
           </label>
           <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+            <input type="checkbox" checked={isForSale} onChange={(e) => setIsForSale(e.target.checked)} style={{ marginRight: '8px', cursor: 'pointer' }} />
+            <span>En venta (se puede comprar en la tienda)</span>
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
             <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} style={{ marginRight: '8px', cursor: 'pointer' }} />
             <span>Destacada (resaltada)</span>
           </label>
@@ -1852,9 +2011,105 @@ export default function Admin() {
                       {activeAlbumGroup.title}
                     </h4>
                   </div>
-                  <span className="admin-category-count">
-                    {activeAlbumGroup.images.length} foto(s)
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                    <span className="admin-category-count">
+                      {activeAlbumGroup.images.length} foto(s)
+                    </span>
+                    {activeAlbumGroup.images.length > 0 && (
+                      <button
+
+   type="button"
+
+   onClick={() => showAllInPortfolio(activeAlbumGroup.images)}
+
+   disabled={bulkUpdating}
+
+   style={{
+
+     border: 'none',
+
+     borderRadius: '9999px',
+
+     padding: '8px 12px',
+
+     fontSize: '0.8rem',
+
+     fontWeight: '600',
+
+     cursor: bulkUpdating ? 'not-allowed' : 'pointer',
+
+     background: bulkUpdating ? '#9ca3af' : '#0ea5e9',
+
+     color: '#fff',
+
+   }}
+
+ >
+
+   {bulkUpdating ? 'Aplicando...' : 'Mostrar todas en portfolio'}
+
+ </button>
+                    )}
+
+                    {activeAlbumGroup.images.length > 0 && (
+
+                    <button
+                        type="button"
+                        onClick={() => hideAllFromPortfolio(activeAlbumGroup.images)}
+                        disabled={bulkUpdating}
+                        style={{
+                          border: 'none',
+                          borderRadius: '999px',
+                          padding: '8px 12px',
+                          fontSize: '0.8rem',
+                          fontWeight: '600',
+                          cursor: bulkUpdating ? 'not-allowed' : 'pointer',
+                          background: bulkUpdating ? '#9ca3af' : '#16a34a',
+                          color: '#fff',
+                        }}
+                      >
+                        {bulkUpdating ? 'Quitando...' : 'Quitar todas del portfolio'}
+                      </button>
+                    )}
+                    {activeAlbumGroup.images.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setAllForSale(activeAlbumGroup.images, true)}
+                        disabled={bulkUpdating}
+                        style={{
+                          border: 'none',
+                          borderRadius: '999px',
+                          padding: '8px 12px',
+                          fontSize: '0.8rem',
+                          fontWeight: '600',
+                          cursor: bulkUpdating ? 'not-allowed' : 'pointer',
+                          background: bulkUpdating ? '#9ca3af' : '#2563eb',
+                          color: '#fff',
+                        }}
+                      >
+                        {bulkUpdating ? 'Aplicando...' : 'Poner todas en venta'}
+                      </button>
+                    )}
+                    {activeAlbumGroup.images.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setAllForSale(activeAlbumGroup.images, false)}
+                        disabled={bulkUpdating}
+                        style={{
+                          border: 'none',
+                          borderRadius: '999px',
+                          padding: '8px 12px',
+                          fontSize: '0.8rem',
+                          fontWeight: '600',
+                          cursor: bulkUpdating ? 'not-allowed' : 'pointer',
+                          background: bulkUpdating ? '#9ca3af' : '#6b7280',
+                          color: '#fff',
+                        }}
+                      >
+                        {bulkUpdating ? 'Aplicando...' : 'Quitar todas de venta'}
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="admin-images-grid">
@@ -1904,10 +2159,45 @@ export default function Admin() {
                         </div>
                         <div style={{ color: '#999', marginTop: '4px' }}>
                           {img.isPortfolio && <span>Portfolio </span>}
+                          {img.isForSale !== false && <span>En venta </span>}
                           {img.isFeatured && <span>Destacada </span>}
                           {img.isCategoryCover && <span>Portada </span>}
                         </div>
                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px' }}>
+                          <button
+                            type="button"
+                            onClick={() => togglePortfolioImage(img)}
+                            disabled={updatingImageId === img.id}
+                            style={{
+                              border: 'none',
+                              borderRadius: '999px',
+                              padding: '6px 8px',
+                              fontSize: '0.72rem',
+                              fontWeight: '600',
+                              cursor: updatingImageId === img.id ? 'not-allowed' : 'pointer',
+                              background: img.isPortfolio ? '#16a34a' : '#e5e7eb',
+                              color: img.isPortfolio ? '#fff' : '#111827',
+                            }}
+                          >
+                            {img.isPortfolio ? 'Ocultar del portfolio' : 'Mostrar en portfolio'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toggleForSaleImage(img)}
+                            disabled={updatingImageId === img.id}
+                            style={{
+                              border: 'none',
+                              borderRadius: '999px',
+                              padding: '6px 8px',
+                              fontSize: '0.72rem',
+                              fontWeight: '600',
+                              cursor: updatingImageId === img.id ? 'not-allowed' : 'pointer',
+                              background: img.isForSale === false ? '#e5e7eb' : '#2563eb',
+                              color: img.isForSale === false ? '#111827' : '#fff',
+                            }}
+                          >
+                            {img.isForSale === false ? 'Poner en venta' : 'Quitar de venta'}
+                          </button>
                           {img.category && (
                             <button
                               type="button"
@@ -2061,6 +2351,40 @@ export default function Admin() {
               </div>
 
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => togglePortfolioImage(previewImage)}
+                  disabled={updatingImageId === previewImage.id}
+                  style={{
+                    border: 'none',
+                    borderRadius: '999px',
+                    padding: '8px 12px',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    cursor: updatingImageId === previewImage.id ? 'not-allowed' : 'pointer',
+                    background: previewImage.isPortfolio ? '#16a34a' : '#e5e7eb',
+                    color: previewImage.isPortfolio ? '#fff' : '#111827',
+                  }}
+                >
+                  {previewImage.isPortfolio ? 'Ocultar del portfolio' : 'Mostrar en portfolio'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleForSaleImage(previewImage)}
+                  disabled={updatingImageId === previewImage.id}
+                  style={{
+                    border: 'none',
+                    borderRadius: '999px',
+                    padding: '8px 12px',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    cursor: updatingImageId === previewImage.id ? 'not-allowed' : 'pointer',
+                    background: previewImage.isForSale === false ? '#e5e7eb' : '#2563eb',
+                    color: previewImage.isForSale === false ? '#111827' : '#fff',
+                  }}
+                >
+                  {previewImage.isForSale === false ? 'Poner en venta' : 'Quitar de venta'}
+                </button>
                 {previewImage.category && (
                   <button
                     type="button"
