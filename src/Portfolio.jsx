@@ -895,12 +895,19 @@ export default function Portfolio({ mode = 'gallery' }) {
     const cleanNumber = whatsAppNumber.replace(/\D/g, '');
     const categoryList = [...new Set(requestedImages.map((image) => image.category || 'General'))];
     const eventList = [...new Set(requestedImages.map((image) => image.label?.trim()).filter(Boolean))];
+    const rqIndPlan = pricingPlanCatalog.find((qq) => qq.kind === 'individual') || chooseLowestPricePlan(pricingPlanCatalog.filter((qq) => qq.size === 1));
+    const rqPackPlans = pricingPlanCatalog.filter((qq) => qq.kind === 'pack' && qq.packSize > 0);
+    const rqPricing = buildPricingRecommendation(requestedImages.length, rqIndPlan, rqPackPlans);
+    const rqDetail = buildPricingSummaryText(rqPricing);
+    const rqTotal = rqPricing ? formatMoney(rqPricing.estimatedTotal) : '';
     const messageLines = [
       whatsAppMessage || DEFAULT_WHATSAPP_MESSAGE,
       '',
       `Categorias: ${categoryList.join(', ')}`,
       ...(eventList.length > 0 ? [`Eventos: ${eventList.join(', ')}`] : []),
       `Cantidad: ${requestedImages.length} foto(s)`,
+      ...(rqTotal ? [`Total estimado: ${rqTotal}`] : []),
+      ...(rqDetail ? [`Detalle: ${rqDetail}`] : []),
       '',
       ...requestedImages.flatMap((image, index) => [
         `${index + 1}. ${image.label || 'Imagen'}${image.category ? ` - ${image.category}` : ''}`,
