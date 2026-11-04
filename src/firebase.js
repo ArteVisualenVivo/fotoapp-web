@@ -102,25 +102,10 @@ const PUBLIC_WATERMARK_COLOR = "FFFFFFB3";
 // (y por tanto todos los rostros). La sintaxis correcta de Cloudinary es
 //   l_text:<fuente>:<texto>,<opciones>/fl_layer_apply,<posicion>
 // las opciones se separan del texto con COMA, nunca con dos puntos.
-function buildWatermarkSteps(maxWidth) {
-  const fontSize = Math.max(24, Math.round(maxWidth * 0.075));
-  const spacing = Math.round(fontSize * 1.7);
-  const range = Math.round(maxWidth * 0.6);
-  const steps = [];
-  let index = 0;
-  for (let y = -range; y <= range; y += spacing, index += 1) {
-    const x = index % 2 === 0 ? "" : ",x_90";
-    steps.push(
-      `l_text:Arial_${fontSize}_bold:${PUBLIC_WATERMARK_TEXT},co_rgb:${PUBLIC_WATERMARK_COLOR}/fl_layer_apply,fl_no_overflow,y_${y}${x}`
-    );
-  }
-  return steps;
-}
-
-// Construye la URL publica con la marca quemada en los pixeles:
-// primero reduce y encadena el patron de texto repetido sobre toda la
-// imagen. Idempotente: si la URL ya trae una cadena de transformaciones
-// previa, la reemplaza en lugar de acumularla.
+// Construye la URL publica: reduce y encadena el tamaño/calidad.
+// La marca de agua ahora se dibuja como capa HTML/CSS sobre la imagen
+// en modo tienda (solo /tienda), porque Cloudinary rechaza la capa
+// l_text con 401 en este entorno.
 export function buildPublicImageUrl(sourceUrl, maxWidth) {
   if (!sourceUrl || !sourceUrl.includes(CLOUDINARY_UPLOAD_MARKER)) return sourceUrl;
 
@@ -141,7 +126,6 @@ export function buildPublicImageUrl(sourceUrl, maxWidth) {
 
   const steps = [
     `f_auto,q_auto:good,w_${maxWidth},c_limit`,
-    ...buildWatermarkSteps(maxWidth),
   ];
 
   return base + steps.join("/") + "/" + tail;
