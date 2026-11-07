@@ -479,8 +479,8 @@ export default function Portfolio() {
       setLoading(true);
       try {
         const [snapshot, settingsSnapshot] = await Promise.all([
-          getDocs(getShopPhotosQuery()),
-          getDoc(getAdminSettingsRef()),
+          getDocs(getShopPhotosQuery(), { source: 'server' }),
+          getDoc(getAdminSettingsRef(), { source: 'server' }),
         ]);
 
         const docs = snapshot.docs
