@@ -882,13 +882,6 @@ export default function Portfolio({ mode = 'gallery' }) {
     setModalIndex(null);
   };
 
-  const openCategory = (categoryName) => {
-    setSelectedCategory(categoryName);
-    setSelectedParentGroup(null);
-    setSelectedAlbumKey(null);
-    setModalIndex(null);
-  };
-
   const openAlbum = (categoryName, albumKey, parentGroupTitle = null) => {
     setSelectedCategory(categoryName);
     setSelectedParentGroup(parentGroupTitle);
