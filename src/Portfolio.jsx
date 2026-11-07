@@ -521,7 +521,7 @@ export default function Portfolio({ mode = 'gallery' }) {
     };
 
     fetchPortfolio();
-  }, []);
+  }, [isShop]);
 
   useEffect(() => {
     const blockContextMenu = (event) => {
