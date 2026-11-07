@@ -1445,11 +1445,11 @@ export default function Portfolio({ mode = 'gallery' }) {
 
         /* ===== TIENDA (modo shop): blur anti-robo + marca de agua en imagen grande y miniaturas ===== */
         /* Solo aplica dentro de .portfolio-shell.is-shop; el portfolio queda limpio. */
-        .portfolio-shell.is-shop .modal-image { filter: blur(4px); }
-        .portfolio-shell.is-shop .modal-overview-card img { filter: blur(3px); }
-        .portfolio-shell.is-shop .card-media img { filter: blur(3px); }
-        .portfolio-shell.is-shop .hero-carousel-card img { filter: blur(7px) brightness(0.94) !important; }
-        .portfolio-shell.is-shop .thumb-button img { filter: blur(3px); }
+        .portfolio-shell.is-shop .modal-image { filter: blur(2px); }
+        .portfolio-shell.is-shop .modal-overview-card img { filter: blur(1.5px); }
+        .portfolio-shell.is-shop .card-media img { filter: blur(1.5px); }
+        .portfolio-shell.is-shop .hero-carousel-card img { filter: blur(3px) brightness(0.94) !important; }
+        .portfolio-shell.is-shop .thumb-button img { filter: blur(1.5px); }
         /* Marca de agua sobre las imágenes de la tienda (capa HTML/CSS, sin depender de Cloudinary) */
         .portfolio-shell.is-shop .hero-carousel-card,
         .portfolio-shell.is-shop .modal-image-wrap,
