@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getDoc, getDocs } from 'firebase/firestore';
 import { getAdminSettingsRef, getPublicPhotosQuery, getShopPhotosQuery, normalizeLabel, normalizePhoto } from './firebase';
 
@@ -440,7 +440,8 @@ function ImageSkeleton({ height = 280 }) {
 }
 
 export default function Portfolio({ mode = 'gallery' }) {
-  const isShop = mode === 'shop';
+  const routerLocation = useLocation();
+  const isShop = mode === 'shop' || routerLocation.pathname.includes('/tienda');
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalIndex, setModalIndex] = useState(null);
@@ -877,6 +878,13 @@ export default function Portfolio({ mode = 'gallery' }) {
     if (!targetGroup) return;
 
     setSelectedParentGroup(targetGroup.title);
+    setSelectedAlbumKey(null);
+    setModalIndex(null);
+  };
+
+  const openCategory = (categoryName) => {
+    setSelectedCategory(categoryName);
+    setSelectedParentGroup(null);
     setSelectedAlbumKey(null);
     setModalIndex(null);
   };
@@ -1892,19 +1900,9 @@ export default function Portfolio({ mode = 'gallery' }) {
                   ))}
                 </div>
               )
-            ) : categories.length === 0 ? (
-              <div
-                style={{
-                  textAlign: 'center',
-                  padding: '72px 20px',
-                  color: 'rgba(245,241,234,0.56)',
-                }}
-              >
-                No hay imagenes disponibles todavia.
-              </div>
             ) : (
               <div className="category-grid">
-                {categories.map((category) => (
+                {categories.length > 0 ? categories.map((category) => (
                   <button
                     key={category.name}
                     type="button"
@@ -1923,7 +1921,17 @@ export default function Portfolio({ mode = 'gallery' }) {
                     </div>
                     <div className="category-label">{category.name}</div>
                   </button>
-                ))}
+                )) : (
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      padding: '72px 20px',
+                      color: 'rgba(245,241,234,0.56)',
+                    }}
+                  >
+                    No hay imagenes disponibles todavia.
+                  </div>
+                )}
               </div>
             )}
           </section>
