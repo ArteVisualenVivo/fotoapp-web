@@ -1015,6 +1015,7 @@ export default function Portfolio({ mode = 'gallery' }) {
 
   return (
     <div
+      className={`portfolio-shell ${isShop ? 'is-shop' : ''}`}
       style={{
         minHeight: '100vh',
         background: '#08080a',
