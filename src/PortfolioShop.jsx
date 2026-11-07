@@ -939,6 +939,46 @@ export default function Portfolio() {
     window.open(`mailto:${contactEmail}?subject=${subject}&body=${body}`, '_self');
   };
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background:
+            'radial-gradient(circle at top, rgba(134, 92, 29, 0.18), transparent 30%), #050505',
+          color: '#f5f1ea',
+          padding: 20,
+        }}
+      >
+        <div
+          style={{
+            fontSize: '1.1rem',
+            marginBottom: '12px',
+            fontWeight: 600,
+            textAlign: 'center',
+          }}
+        >
+          Cargando tienda...
+        </div>
+        <div
+          style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid rgba(255,255,255,0.2)',
+            borderTopColor: '#1f6b4f',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+          }}
+        ></div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{

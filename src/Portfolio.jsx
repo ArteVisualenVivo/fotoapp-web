@@ -974,6 +974,45 @@ export default function Portfolio({ mode = 'gallery' }) {
     window.open(`mailto:${contactEmail}?subject=${subject}&body=${body}`, '_self');
   };
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#08080a',
+          color: '#f3efe6',
+          padding: 20,
+        }}
+      >
+        <div
+          style={{
+            fontSize: '1.1rem',
+            marginBottom: '12px',
+            fontWeight: 600,
+            textAlign: 'center',
+          }}
+        >
+          Cargando galer&iacute;a...
+        </div>
+        <div
+          style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid rgba(201,168,106,0.2)',
+            borderTopColor: '#c9a86a',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+          }}
+        ></div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
