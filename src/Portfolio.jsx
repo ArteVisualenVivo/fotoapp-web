@@ -482,7 +482,7 @@ export default function Portfolio({ mode = 'gallery' }) {
         // La tienda (shop) siempre muestra sus fotos.
         let docs = [];
         if (isShop || !PORTFOLIO_VACIO) {
-          const snapshot = await getDocs(isShop ? getShopPhotosQuery() : getPublicPhotosQuery());
+          const snapshot = await getDocs(isShop ? getShopPhotosQuery() : getPublicPhotosQuery(), { source: 'server' });
           docs = snapshot.docs
             .map((docItem) => {
               const photo = normalizePhoto(docItem.id, docItem.data());
