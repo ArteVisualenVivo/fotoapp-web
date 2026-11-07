@@ -3,7 +3,6 @@ import {
   collection,
   doc,
   getFirestore,
-  orderBy,
   query,
   where,
 } from "firebase/firestore";
@@ -57,18 +56,14 @@ export function getPhotosCollection() {
 }
 
 export function getPublicPhotosQuery() {
-  return query(
-    getPhotosCollection(),
-    where("isPortfolio", "==", true),
-    orderBy("createdAt", "desc")
-  );
+  return query(getPhotosCollection(), where("isPortfolio", "==", true));
 }
 
 // Tienda: trae todas las fotos. El filtro "en venta" se aplica en el cliente
 // (isForSale !== false) para que las fotos ya subidas, que aun no tienen el
 // campo, sigan apareciendo en la tienda hasta que se las marque como "no en venta".
 export function getShopPhotosQuery() {
-  return query(getPhotosCollection(), orderBy("createdAt", "desc"));
+  return getPhotosCollection();
 }
 
 
