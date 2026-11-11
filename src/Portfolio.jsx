@@ -1935,26 +1935,66 @@ export default function Portfolio({ mode = 'gallery' }) {
               )
             ) : (
               <div className="category-grid">
-                {categories.length > 0 ? categories.map((category) => (
-                  <button
-                    key={category.name}
-                    type="button"
-                    className="category-card"
-                    onClick={() => { setSelectedCategory(category.name); setSelectedAlbumKey(null); setModalIndex(images.findIndex((img) => img.category === category.name && img.url)); }}
-                  >
-                    <div className="card-media">
-                      <img
-                        src={thumbSrc(category.cover) || thumbSrc(category.images[0])}
-                        alt={category.name}
-                        loading="lazy"
-                        onContextMenu={blockImageInteraction}
-                        onDragStart={blockImageInteraction}
-                        onError={() => handleImageError(category.cover?.url || category.images[0]?.url)}
-                      />
+                {!isShop && categories.length > 0 ? (
+                  <>
+                    <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      <button type="button" className="category-card" onClick={() => setSelectedCategory(null)}>Todas</button>
+                      {categories.map((category) => (
+                        <button
+                          key={category.name}
+                          type="button"
+                          className={`category-card ${selectedCategory === category.name ? 'is-active' : ''}`}
+                          onClick={() => setSelectedCategory(category.name)}
+                        >
+                          {category.name}
+                        </button>
+                      ))}
                     </div>
-                    <div className="category-label">{category.name}</div>
-                  </button>
-                )) : (
+                    <div className="category-grid is-expanded">
+                      {images.filter((img) => !selectedCategory || img.category === selectedCategory).map((image) => (
+                        <button
+                          key={image.id}
+                          type="button"
+                          className="category-card"
+                          onClick={() => setModalIndex(images.findIndex((img) => img.id === image.id))}
+                        >
+                          <div className="card-media">
+                            <img
+                              src={thumbSrc(image)}
+                              alt={image.label || image.category || 'Foto'}
+                              loading="lazy"
+                              onContextMenu={blockImageInteraction}
+                              onDragStart={blockImageInteraction}
+                              onError={() => handleImageError(image.url)}
+                            />
+                          </div>
+                          <div className="category-label">{image.label || image.category || 'Foto'}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : categories.length > 0 ? (
+                  categories.map((category) => (
+                    <button
+                      key={category.name}
+                      type="button"
+                      className="category-card"
+                      onClick={() => { setSelectedCategory(category.name); setSelectedAlbumKey(null); setModalIndex(images.findIndex((img) => img.category === category.name && img.url)); }}
+                    >
+                      <div className="card-media">
+                        <img
+                          src={thumbSrc(category.cover) || thumbSrc(category.images[0])}
+                          alt={category.name}
+                          loading="lazy"
+                          onContextMenu={blockImageInteraction}
+                          onDragStart={blockImageInteraction}
+                          onError={() => handleImageError(category.cover?.url || category.images[0]?.url)}
+                        />
+                      </div>
+                      <div className="category-label">{category.name}</div>
+                    </button>
+                  ))
+                ) : (
                   <div
                     style={{
                       textAlign: 'center',
