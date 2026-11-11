@@ -1236,10 +1236,10 @@ export default function Portfolio({ mode = 'gallery' }) {
         .compact-copy p { margin:14px 0 0; color:rgba(243,239,230,0.58); line-height:1.7; max-width:60ch; font-weight:300; }
 
         .category-grid {
-          display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); justify-content:center;
-          gap:clamp(16px,2vw,26px);
+          display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); justify-content:start;
+          gap:clamp(16px,2vw,26px); width:100%; max-width:none;
         }
-        .category-grid.is-expanded { grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); justify-content:center; }
+        .category-grid.is-expanded { grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); justify-content:start; width:100%; max-width:none; }
         .category-card {
           position:relative; display:flex; flex-direction:column; text-align:left;
           padding:0; border:1px solid rgba(243,239,230,0.1); border-radius:3px;
