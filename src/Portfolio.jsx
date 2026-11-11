@@ -1261,6 +1261,22 @@ export default function Portfolio({ mode = 'gallery' }) {
           justify-content:space-between; gap:10px;
         }
 
+        .filter-btn {
+          border:1px solid rgba(243,239,230,0.14); border-radius:2px; padding:8px 16px;
+          background:transparent; color:rgba(243,239,230,0.8); font-size:0.85rem;
+          cursor:pointer; transition:all 0.2s ease; font-family:inherit;
+        }
+        .filter-btn:hover { border-color:rgba(201,168,106,0.4); color:#f3efe6; }
+        .filter-btn.active { border-color:rgba(201,168,106,0.7); color:#e9d9b6; background:rgba(201,168,106,0.08); }
+
+        .photo-card {
+          position:relative; display:flex; flex-direction:column; text-align:left;
+          padding:0; border:1px solid rgba(243,239,230,0.1); border-radius:3px;
+          background:#101012; cursor:pointer; overflow:hidden;
+          transition:transform 0.3s ease, border-color 0.3s ease;
+        }
+        .photo-card:hover { border-color:rgba(201,168,106,0.4); }
+
         .badge {
           display:inline-flex; align-items:center; padding:5px 11px; border-radius:2px;
           border:1px solid rgba(243,239,230,0.14); background:rgba(243,239,230,0.03);
@@ -1934,28 +1950,34 @@ export default function Portfolio({ mode = 'gallery' }) {
                 </div>
               )
             ) : (
-              <div className="category-grid">
+              <div style={{ width: '100%' }}>
                 {!isShop && categories.length > 0 ? (
                   <>
-                    <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                      <button type="button" className="category-card" onClick={() => setSelectedCategory(null)}>Todas</button>
+                    <div style={{ marginBottom: '24px', display: 'flex', gap: '10px', flexWrap: 'wrap', width: '100%' }}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCategory(null)}
+                        className={`filter-btn ${selectedCategory === null ? 'active' : ''}`}
+                      >
+                        Todas
+                      </button>
                       {categories.map((category) => (
                         <button
                           key={category.name}
                           type="button"
-                          className={`category-card ${selectedCategory === category.name ? 'is-active' : ''}`}
                           onClick={() => setSelectedCategory(category.name)}
+                          className={`filter-btn ${selectedCategory === category.name ? 'active' : ''}`}
                         >
                           {category.name}
                         </button>
                       ))}
                     </div>
-                    <div className="category-grid is-expanded">
+                    <div className="category-grid is-expanded" style={{ marginTop: '0' }}>
                       {images.filter((img) => !selectedCategory || img.category === selectedCategory).map((image) => (
                         <button
                           key={image.id}
                           type="button"
-                          className="category-card"
+                          className="photo-card"
                           onClick={() => setModalIndex(images.findIndex((img) => img.id === image.id))}
                         >
                           <div className="card-media">
