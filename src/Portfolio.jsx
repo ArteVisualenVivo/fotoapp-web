@@ -4,7 +4,7 @@ import { getDoc, getDocs } from 'firebase/firestore';
 import { getAdminSettingsRef, getPublicPhotosQuery, getShopPhotosQuery, normalizeLabel, normalizePhoto } from './firebase';
 
 const DEFAULT_WHATSAPP_MESSAGE = 'Hola, quiero consultar por estas fotos:';
-const DEFAULT_CONTACT_EMAIL = 'cesardarioph@gmail.com';
+const DEFAULT_CONTACT_EMAIL = 'artevisualenvivo@gmail.com';
 const DEFAULT_LOCATION = 'Cordoba, Argentina';
 const DEFAULT_PRICING_TITLE = 'Servicios y precios';
 const DEFAULT_PRICING_BODY =
@@ -1580,7 +1580,7 @@ export default function Portfolio({ mode = 'gallery' }) {
               <p>
                 {isShop
                   ? 'Elegi tus fotos favoritas, marcalas y pedilas por WhatsApp. Los precios se calculan solos a medida que seleccionas.'
-                  : 'Fotografia de eventos, retratos y escenas en vivo. Trabajo en bodas, 15 años, books, paisajes, playa, recitales, cuarteto, boliches y proyectos visuales de todo tipo.'}
+                  : 'Fotografía de eventos, música y retratos. Cobertura profesional para prensa, agencias y clientes en Córdoba y todo el país.'}
               </p>
               {isShop && (
                 <div className="shop-how">
