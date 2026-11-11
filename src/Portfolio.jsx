@@ -1576,7 +1576,7 @@ export default function Portfolio({ mode = 'gallery' }) {
           <header className="hero" id="portfolio">
             <div className="hero-copy">
               <div className="eyebrow">{isShop ? 'Tienda' : 'Portfolio'}</div>
-              <h1>{isShop ? 'Comprar fotos' : (<>{adminName || 'César Dario'} <span className="hero-amp">&</span> <a className="hero-alias" href="https://www.instagram.com/artevisualenvivo?utm_source=qr&igsh=NndiZG05czlnZ2Vs" target="_blank" rel="noreferrer">ArteVisualenVivo</a></>)}</h1>
+              <h1>{isShop ? 'Comprar fotos' : 'CesarPh'}</h1>
               <p>
                 {isShop
                   ? 'Elegi tus fotos favoritas, marcalas y pedilas por WhatsApp. Los precios se calculan solos a medida que seleccionas.'
@@ -1971,9 +1971,9 @@ export default function Portfolio({ mode = 'gallery' }) {
 
           <footer className="footer">
             <div>
-              {<div style={{ fontWeight: 600, color: '#fff6ed' }}>{adminName || 'César Dario'}</div>}
+              {<div style={{ fontWeight: 600, color: '#fff6ed' }}>CesarPh</div>}
               <div style={{ marginTop: '6px' }}>
-                Fotografia para eventos, retratos y proyectos visuales.
+                Fotografia de eventos, musica y retratos · Cobertura profesional para prensa y agencias
               </div>
               <div className="footer-socials">
                 {INSTAGRAM_LINKS.map((account) => (
