@@ -1940,7 +1940,7 @@ export default function Portfolio({ mode = 'gallery' }) {
                     key={category.name}
                     type="button"
                     className="category-card"
-                    onClick={() => openCategory(category.name)}
+                    onClick={() => { setSelectedCategory(category.name); setSelectedAlbumKey(null); setModalIndex(images.findIndex((img) => img.category === category.name && img.url)); }}
                   >
                     <div className="card-media">
                       <img
