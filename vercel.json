@@ -1,5 +1,9 @@
 {
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
-  ]
+  ],
+  "build": {
+    "command": "npm ci && npx vite build",
+    "outputDirectory": "dist"
+  }
 }
