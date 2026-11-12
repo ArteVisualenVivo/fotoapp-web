@@ -531,14 +531,8 @@ export default function Portfolio({ mode = 'gallery' }) {
     const blockShortcuts = (event) => {
       const key = event.key?.toLowerCase();
       const isSaveShortcut = (event.ctrlKey || event.metaKey) && key === 's';
-      const isDevtoolsShortcut =
-        key === 'f12' ||
-        ((event.ctrlKey || event.metaKey) &&
-          event.shiftKey &&
-          ['i', 'j', 'c', 's'].includes(key)) ||
-        ((event.ctrlKey || event.metaKey) && key === 'u');
 
-      if (isSaveShortcut || isDevtoolsShortcut || key === 'printscreen') {
+      if (isSaveShortcut) {
         event.preventDefault();
       }
     };
@@ -1047,11 +1041,11 @@ export default function Portfolio({ mode = 'gallery' }) {
         /* Capa de grano de pelcula + vieta cinematografica (no bloquea clicks) */
         .cine-grain, .cine-vignette { position:fixed; inset:0; pointer-events:none; z-index:55; }
         .cine-grain {
-          opacity:0.05; mix-blend-mode:overlay;
+          opacity:0.022; mix-blend-mode:overlay;
           background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-          animation:grainShift 0.9s steps(4) infinite;
+          animation:grainShift 3s steps(4) infinite;
         }
-        .cine-vignette { background:radial-gradient(120% 100% at 50% 45%, transparent 55%, rgba(0,0,0,0.55) 100%); }
+        .cine-vignette { background:radial-gradient(120% 100% at 50% 45%, transparent 62%, rgba(0,0,0,0.32) 100%); }
 
         /* Reveal al entrar en pantalla */
         .reveal { opacity:0; transform:translateY(26px); }
@@ -1951,71 +1945,29 @@ export default function Portfolio({ mode = 'gallery' }) {
               )
             ) : (
               <div style={{ width: '100%' }}>
-                {!isShop && categories.length > 0 ? (
-                  <>
-                    <div style={{ marginBottom: '24px', display: 'flex', gap: '10px', flexWrap: 'wrap', width: '100%' }}>
+                {categories.length > 0 ? (
+                  <div className="category-grid is-expanded" style={{ marginTop: '0' }}>
+                    {categories.map((category) => (
                       <button
+                        key={category.name}
                         type="button"
-                        onClick={() => setSelectedCategory(null)}
-                        className={`filter-btn ${selectedCategory === null ? 'active' : ''}`}
+                        className="category-card"
+                        onClick={() => openCategory(category.name)}
                       >
-                        Todas
+                        <div className="card-media">
+                          <img
+                            src={thumbSrc(category.cover) || thumbSrc(category.images[0])}
+                            alt={category.name}
+                            loading="lazy"
+                            onContextMenu={blockImageInteraction}
+                            onDragStart={blockImageInteraction}
+                            onError={() => handleImageError(category.cover?.url || category.images[0]?.url)}
+                          />
+                        </div>
+                        <div className="category-label">{category.name}</div>
                       </button>
-                      {categories.map((category) => (
-                        <button
-                          key={category.name}
-                          type="button"
-                          onClick={() => setSelectedCategory(category.name)}
-                          className={`filter-btn ${selectedCategory === category.name ? 'active' : ''}`}
-                        >
-                          {category.name}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="category-grid is-expanded" style={{ marginTop: '0' }}>
-                      {images.filter((img) => !selectedCategory || img.category === selectedCategory).map((image) => (
-                        <button
-                          key={image.id}
-                          type="button"
-                          className="photo-card"
-                          onClick={() => setModalIndex(images.findIndex((img) => img.id === image.id))}
-                        >
-                          <div className="card-media">
-                            <img
-                              src={thumbSrc(image)}
-                              alt={image.label || image.category || 'Foto'}
-                              loading="lazy"
-                              onContextMenu={blockImageInteraction}
-                              onDragStart={blockImageInteraction}
-                              onError={() => handleImageError(image.url)}
-                            />
-                          </div>
-                          <div className="category-label">{image.label || image.category || 'Foto'}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                ) : categories.length > 0 ? (
-                  categories.map((category) => (
-                    <button
-                      key={category.name}
-                      type="button"
-                      className="category-card"
-                      onClick={() => { setSelectedCategory(category.name); setSelectedAlbumKey(null); setModalIndex(images.findIndex((img) => img.category === category.name && img.url)); }}
-                    >
-                      <div className="card-media">
-                        <img
-                          src={thumbSrc(category.cover) || thumbSrc(category.images[0])}
-                          alt={category.name}
-                          loading="lazy"
-                          onContextMenu={blockImageInteraction}
-                          onDragStart={blockImageInteraction}
-                          onError={() => handleImageError(category.cover?.url || category.images[0]?.url)}
-                        />
-                      </div>
-                      <div className="category-label">{category.name}</div>
-                    </button>
-                  ))
+                    ))}
+                  </div>
                 ) : (
                   <div
                     style={{
