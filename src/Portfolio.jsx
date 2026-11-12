@@ -448,6 +448,8 @@ export default function Portfolio({ mode = 'gallery' }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedParentGroup, setSelectedParentGroup] = useState(null);
   const [selectedAlbumKey, setSelectedAlbumKey] = useState(null);
+  const [galleryFilter, setGalleryFilter] = useState(null);
+  const [galleryModalIndex, setGalleryModalIndex] = useState(null);
   const [selectedPhotoIds, setSelectedPhotoIds] = useState([]);
   const [whatsAppNumber, setWhatsAppNumber] = useState('');
   const [adminName, setAdminName] = useState('');
@@ -547,6 +549,22 @@ export default function Portfolio({ mode = 'gallery' }) {
   }, []);
 
   const categories = useMemo(() => groupByCategoryAndEvent(images), [images]);
+  const portfolioCategoryList = useMemo(() => {
+    const seen = new Set();
+    const list = [];
+    for (const image of images) {
+      const name = (image.category || '').trim();
+      if (!name || seen.has(name)) continue;
+      seen.add(name);
+      list.push(name);
+    }
+    return list.sort((a, b) => a.localeCompare(b, 'es'));
+  }, [images]);
+  const filteredGalleryImages = useMemo(() => {
+    const sorted = sortImagesByNewest(images);
+    if (!galleryFilter) return sorted;
+    return sorted.filter((image) => (image.category || '').trim() === galleryFilter);
+  }, [images, galleryFilter]);
 
   useEffect(() => {
     const baseTitle = 'César Dario — Fotografía en Córdoba | Portfolio';
@@ -756,6 +774,14 @@ export default function Portfolio({ mode = 'gallery' }) {
     setSelectedAlbumKey(null);
   }, []);
 
+  const openGalleryImage = useCallback((index) => {
+    setGalleryModalIndex(index);
+  }, []);
+
+  const closeGalleryModal = useCallback(() => {
+    setGalleryModalIndex(null);
+  }, []);
+
   useEffect(() => {
     if (!modalImage) return undefined;
 
@@ -772,6 +798,34 @@ export default function Portfolio({ mode = 'gallery' }) {
     window.addEventListener('keydown', handleKeyNavigation);
     return () => window.removeEventListener('keydown', handleKeyNavigation);
   }, [modalImage, activeAlbumImages.length, closeModal]);
+
+  useEffect(() => {
+    if (galleryModalIndex === null) return undefined;
+
+    const handleKeyNavigation = (event) => {
+      if (event.key === 'Escape') closeGalleryModal();
+      if (event.key === 'ArrowRight') {
+        setGalleryModalIndex((current) => (current + 1) % filteredGalleryImages.length);
+      }
+      if (event.key === 'ArrowLeft') {
+        setGalleryModalIndex(
+          (current) => (current - 1 + filteredGalleryImages.length) % filteredGalleryImages.length
+        );
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyNavigation);
+    return () => window.removeEventListener('keydown', handleKeyNavigation);
+  }, [galleryModalIndex, filteredGalleryImages.length, closeGalleryModal]);
+
+  useEffect(() => {
+    if (galleryModalIndex === null) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [galleryModalIndex]);
 
   useEffect(() => {
     if (!isContactOpen) return undefined;
@@ -888,6 +942,8 @@ export default function Portfolio({ mode = 'gallery' }) {
     setSelectedCategory(null);
     setSelectedParentGroup(null);
     setSelectedAlbumKey(null);
+    setGalleryFilter(null);
+    setGalleryModalIndex(null);
     setIsContactOpen(false);
 
     window.requestAnimationFrame(() => {
@@ -1492,6 +1548,39 @@ export default function Portfolio({ mode = 'gallery' }) {
           transform: rotate(-18deg);
           white-space: nowrap;
         }
+
+        /* ===== PORTFOLIO: galeria plana (2 niveles: grid + lightbox) ===== */
+        .hero.is-gallery { padding: clamp(16px,2.5vw,30px) 0 clamp(10px,1.6vw,20px); }
+        .hero.is-gallery .hero-visual { min-height: clamp(150px,16vw,220px); }
+
+        .gallery-filters {
+          display:flex; gap:8px; flex-wrap:wrap; margin: 6px 0 22px;
+          align-items:center;
+        }
+        .gallery-filter-chip {
+          border:1px solid rgba(243,239,230,0.14); border-radius:999px; padding:8px 18px;
+          background:transparent; color:rgba(243,239,230,0.68); font-size:0.85rem;
+          cursor:pointer; transition:all 0.2s ease; font-family:inherit;
+        }
+        .gallery-filter-chip:hover { border-color:rgba(201,168,106,0.5); color:#f3efe6; }
+        .gallery-filter-chip.is-active { border-color:#c9a86a; color:#e9d9b6; background:rgba(201,168,106,0.1); }
+
+        .gallery-grid {
+          display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px;
+        }
+        .gallery-photo {
+          position:relative; padding:0; border:1px solid rgba(243,239,230,0.1); border-radius:3px;
+          background:#101012; cursor:pointer; overflow:hidden; aspect-ratio:4/5;
+          transition:border-color 0.3s ease, transform 0.3s ease;
+        }
+        .gallery-photo:hover { border-color:rgba(201,168,106,0.5); transform:translateY(-3px); }
+        .gallery-photo img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.6s cubic-bezier(0.2,0.7,0.2,1); }
+        .gallery-photo:hover img { transform:scale(1.06); }
+
+        @media (max-width: 780px) {
+          .gallery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+          .gallery-photo { aspect-ratio:3/4; }
+        }
         `}</style>
 
       <div className={'portfolio-shell' + (isShop ? ' is-shop' : '')}>
@@ -1583,7 +1672,7 @@ export default function Portfolio({ mode = 'gallery' }) {
             </div>
           </div>
 
-          <header className="hero" id="portfolio">
+          <header className={'hero' + (!isShop ? ' is-gallery' : '')} id="portfolio">
             <div className="hero-copy">
               <div className="eyebrow">{isShop ? 'Tienda' : 'Portfolio'}</div>
               <h1>{isShop ? 'Comprar fotos' : 'CesarPh'}</h1>
@@ -1823,7 +1912,8 @@ export default function Portfolio({ mode = 'gallery' }) {
                   <ImageSkeleton key={index} />
                 ))}
               </div>
-              ) : selectedCategory ? (
+            ) : isShop ? (
+              selectedCategory ? (
                 selectedParentGroup && activeParentGroup ? (
                   activeParentGroup.albums.length === 0 ? (
                   <div
@@ -1965,6 +2055,62 @@ export default function Portfolio({ mode = 'gallery' }) {
                           />
                         </div>
                         <div className="category-label">{category.name}</div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      padding: '72px 20px',
+                      color: 'rgba(245,241,234,0.56)',
+                    }}
+                  >
+                    No hay imagenes disponibles todavia.
+                  </div>
+                )}
+              </div>
+            )
+            ) : (
+              /* ===== PORTFOLIO: galeria plana de fotos + filtros por categoria ===== */
+              <div style={{ width: '100%' }}>
+                <div className="gallery-filters" aria-label="Filtrar por categoria">
+                  <button
+                    type="button"
+                    className={'gallery-filter-chip' + (!galleryFilter ? ' is-active' : '')}
+                    onClick={() => setGalleryFilter(null)}
+                  >
+                    Todas
+                  </button>
+                  {portfolioCategoryList.map((name) => (
+                    <button
+                      key={name}
+                      type="button"
+                      className={'gallery-filter-chip' + (galleryFilter === name ? ' is-active' : '')}
+                      onClick={() => setGalleryFilter(name)}
+                    >
+                      {name}
+                    </button>
+                  ))}
+                </div>
+
+                {filteredGalleryImages.length > 0 ? (
+                  <div className="gallery-grid">
+                    {filteredGalleryImages.map((image, index) => (
+                      <button
+                        key={image.id}
+                        type="button"
+                        className="gallery-photo"
+                        onClick={() => openGalleryImage(index)}
+                      >
+                        <img
+                          src={thumbSrc(image)}
+                          alt={image.label || image.category || 'Foto del portfolio'}
+                          loading="lazy"
+                          onContextMenu={blockImageInteraction}
+                          onDragStart={blockImageInteraction}
+                          onError={() => handleImageError(image.url)}
+                        />
                       </button>
                     ))}
                   </div>
@@ -2241,6 +2387,90 @@ export default function Portfolio({ mode = 'gallery' }) {
               </div>
                 </>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* ===== PORTFOLIO: lightbox de la galeria plana (independiente de la tienda) ===== */}
+        {!isShop && galleryModalIndex !== null && filteredGalleryImages[galleryModalIndex] && (
+          <div className="modal-overlay" onClick={closeGalleryModal}>
+            <div className="modal-content" onClick={(event) => event.stopPropagation()}>
+              <div className="modal-image-wrap">
+                <img
+                  className="modal-image"
+                  src={filteredGalleryImages[galleryModalIndex].url}
+                  alt={
+                    filteredGalleryImages[galleryModalIndex].label ||
+                    filteredGalleryImages[galleryModalIndex].category ||
+                    'Foto del portfolio'
+                  }
+                  onContextMenu={blockImageInteraction}
+                  onDragStart={blockImageInteraction}
+                />
+                <button type="button" className="modal-close" onClick={closeGalleryModal}>
+                  X
+                </button>
+                {filteredGalleryImages.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      className="modal-nav"
+                      style={{ left: '18px' }}
+                      onClick={() =>
+                        setGalleryModalIndex(
+                          (current) =>
+                            (current - 1 + filteredGalleryImages.length) % filteredGalleryImages.length
+                        )
+                      }
+                    >
+                      {'<'}
+                    </button>
+                    <button
+                      type="button"
+                      className="modal-nav"
+                      style={{ right: '18px' }}
+                      onClick={() =>
+                        setGalleryModalIndex(
+                          (current) => (current + 1) % filteredGalleryImages.length
+                        )
+                      }
+                    >
+                      {'>'}
+                    </button>
+                  </>
+                )}
+              </div>
+
+              <div className="modal-info">
+                {filteredGalleryImages[galleryModalIndex].label && (
+                  <p className="modal-title">{filteredGalleryImages[galleryModalIndex].label}</p>
+                )}
+                <div className="modal-sub">
+                  {galleryModalIndex + 1} / {filteredGalleryImages.length}
+                </div>
+                <div className="modal-actions">
+                  {filteredGalleryImages[galleryModalIndex].category && (
+                    <span className="badge">{filteredGalleryImages[galleryModalIndex].category}</span>
+                  )}
+                  {filteredGalleryImages[galleryModalIndex].isFeatured && (
+                    <span className="badge badge-gold">Destacada</span>
+                  )}
+                </div>
+                {filteredGalleryImages.length > 1 && (
+                  <div className="modal-thumb-row">
+                    {filteredGalleryImages.map((image, index) => (
+                      <button
+                        key={image.id}
+                        type="button"
+                        className={'thumb-button' + (index === galleryModalIndex ? ' active' : '')}
+                        onClick={() => setGalleryModalIndex(index)}
+                      >
+                        <img src={thumbSrc(image)} alt={image.label || `Miniatura ${index + 1}`} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
