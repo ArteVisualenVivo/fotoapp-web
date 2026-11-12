@@ -1779,58 +1779,6 @@ export default function Portfolio({ mode = 'gallery' }) {
                   </div>
                 )}
               </div>
-
-              {heroCategoryOptions.length > 1 ? (
-                <div className="hero-category-strip" aria-label="Filtrar carrusel por categoria">
-                  {heroCategoryOptions.map((option) => (
-                    <button
-                      key={option.key}
-                      type="button"
-                      className={`hero-category-pill ${heroCategoryKey === option.key ? 'is-active' : ''}`}
-                      onClick={() => {
-                        setHeroCategoryKey(option.key);
-                        setHeroCoverIndex(0);
-                        heroCoverIndexRef.current = 0;
-                        setHeroSlideState({ animating: false, from: 0, to: 0 });
-                      }}
-                      aria-pressed={heroCategoryKey === option.key}
-                    >
-                      <span>{option.label}</span>
-                      
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-
-                {heroCurrentImage?.url ? (
-                <div className="hero-stage-caption" aria-label="Hero cover details">
-                  <div className="hero-stage-caption-copy">
-                  <div className="hero-stage-kicker">Portada seleccionada</div>
-                    <strong>{heroCurrentImage.label || heroCurrentImage.category || 'Portada'}</strong>
-                  </div>
-                  {heroCarouselImages.length > 1 ? (
-                    <div className="hero-dots" role="tablist" aria-label="Portadas">
-                      {heroCarouselImages.map((image, dotIndex) => (
-                        <button
-                          key={image.id}
-                          type="button"
-                          role="tab"
-                          aria-selected={dotIndex === heroCarouselCurrentIndex}
-                          aria-label={'Portada ' + (dotIndex + 1)}
-                          className={'hero-dot' + (dotIndex === heroCarouselCurrentIndex ? ' is-active' : '')}
-                          onClick={() => goToHeroSlide(dotIndex)}
-                        />
-                      ))}
-                    </div>
-                  ) : null}
-                  <div className="hero-stage-meta">
-                    <span>{heroCategoryOptions.find((option) => option.key === heroCategoryKey)?.label || heroCurrentImage.category || 'General'}</span>
-                    <span>
-                      {heroCarouselImages.length > 0 ? `${heroCarouselCurrentIndex + 1}/${heroCarouselImages.length}` : '1/1'}
-                    </span>
-                  </div>
-                </div>
-              ) : null}
             </div>
           </header>
 
