@@ -1582,10 +1582,19 @@ export default function Portfolio({ mode = 'gallery' }) {
         .gallery-photo:hover { border-color:rgba(201,168,106,0.5); transform:translateY(-3px); }
         .gallery-photo img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.6s cubic-bezier(0.2,0.7,0.2,1); }
         .gallery-photo:hover img { transform:scale(1.06); }
+        .gallery-photo-caption {
+          position:absolute; left:0; right:0; bottom:0; padding:28px 12px 10px;
+          background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 55%, transparent 100%);
+          color:#f3efe6; font-size:0.82rem; font-weight:600; letter-spacing:0.02em;
+          text-align:left; pointer-events:none; opacity:0; transition:opacity 0.25s ease;
+          text-shadow:0 1px 3px rgba(0,0,0,0.7);
+        }
+        .gallery-photo:hover .gallery-photo-caption { opacity:1; }
 
         @media (max-width: 780px) {
           .gallery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
           .gallery-photo { aspect-ratio:3/4; }
+          .gallery-photo-caption { opacity:1; font-size:0.74rem; padding:22px 9px 8px; }
         }
         `}</style>
 
@@ -2107,23 +2116,27 @@ export default function Portfolio({ mode = 'gallery' }) {
 
                 {filteredGalleryImages.length > 0 ? (
                   <div className="gallery-grid">
-                    {filteredGalleryImages.map((image, index) => (
-                      <button
-                        key={image.id}
-                        type="button"
-                        className="gallery-photo"
-                        onClick={() => openGalleryImage(index)}
-                      >
-                        <img
-                          src={thumbSrc(image)}
-                          alt={image.label || image.category || 'Foto del portfolio'}
-                          loading="lazy"
-                          onContextMenu={blockImageInteraction}
-                          onDragStart={blockImageInteraction}
-                          onError={() => handleImageError(image.url)}
-                        />
-                      </button>
-                    ))}
+                    {filteredGalleryImages.map((image, index) => {
+                      const bandName = parseAlbumLabel(image.label).childTitle;
+                      return (
+                        <button
+                          key={image.id}
+                          type="button"
+                          className="gallery-photo"
+                          onClick={() => openGalleryImage(index)}
+                        >
+                          <img
+                            src={thumbSrc(image)}
+                            alt={image.label || image.category || 'Foto del portfolio'}
+                            loading="lazy"
+                            onContextMenu={blockImageInteraction}
+                            onDragStart={blockImageInteraction}
+                            onError={() => handleImageError(image.url)}
+                          />
+                          {bandName && <div className="gallery-photo-caption">{bandName}</div>}
+                        </button>
+                      );
+                    })}
                   </div>
                 ) : (
                   <div
