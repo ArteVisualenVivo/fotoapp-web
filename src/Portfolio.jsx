@@ -567,7 +567,7 @@ export default function Portfolio({ mode = 'gallery' }) {
   }, [images, galleryFilter]);
 
   useEffect(() => {
-    const baseTitle = 'César Dario — Fotografía en Córdoba | Portfolio';
+    const baseTitle = 'artevisualenvivo — Fotografía en Córdoba | Portfolio';
     const shopTitle = 'Comprar fotos | ' + baseTitle;
     if (isShop) {
       document.title = selectedCategory ? selectedCategory + ' — ' + shopTitle : shopTitle;
@@ -1556,12 +1556,16 @@ export default function Portfolio({ mode = 'gallery' }) {
         }
 
         /* ===== PORTFOLIO: galeria plana (2 niveles: grid + lightbox) ===== */
-        .hero.is-gallery { padding: clamp(16px,2.5vw,30px) 0 clamp(10px,1.6vw,20px); }
-        .hero.is-gallery .hero-visual { min-height: clamp(150px,16vw,220px); }
+        .hero.is-gallery { padding: clamp(10px,1.8vw,22px) 0 clamp(6px,1vw,14px); }
+        .hero.is-gallery .hero-visual { min-height: clamp(110px,11vw,170px); }
+        .hero.is-gallery .eyebrow { margin-bottom: 10px; }
+        .hero.is-gallery h1 { font-size: clamp(1.8rem,4.6vw,3.2rem); }
+        .hero.is-gallery p { margin: 8px 0 0; font-size: 0.88rem; line-height: 1.5; max-width: 52ch; }
 
         .gallery-filters {
           display:flex; gap:8px; flex-wrap:wrap; margin: 6px 0 22px;
-          align-items:center;
+          align-items:center; position:sticky; top:64px; z-index:20;
+          background:rgba(5,5,5,0.88); backdrop-filter:blur(10px); padding:10px 4px; border-radius:6px;
         }
         .gallery-filter-chip {
           border:1px solid rgba(243,239,230,0.14); border-radius:999px; padding:8px 18px;
@@ -1604,7 +1608,7 @@ export default function Portfolio({ mode = 'gallery' }) {
           <div className="glass-frame">
           <div className="top-nav">
             <div className="brand">
-              <div className="brand-mark">CP</div>
+              <div className="brand-mark">AV</div>
             <div className="brand-copy">
                 <span>Eventos, retratos, paisajes y escena en vivo</span>
               </div>
@@ -1695,7 +1699,7 @@ export default function Portfolio({ mode = 'gallery' }) {
           <header className={'hero' + (!isShop ? ' is-gallery' : '')} id="portfolio">
             <div className="hero-copy">
               <div className="eyebrow">{isShop ? 'Tienda' : 'Portfolio'}</div>
-              <h1>{isShop ? 'Comprar fotos' : 'CesarPh'}</h1>
+              <h1>{isShop ? 'Comprar fotos' : 'artevisualenvivo'}</h1>
               <p>
                 {isShop
                   ? 'Elegi tus fotos favoritas, marcalas y pedilas por WhatsApp. Los precios se calculan solos a medida que seleccionas.'
@@ -2155,7 +2159,7 @@ export default function Portfolio({ mode = 'gallery' }) {
 
           <footer className="footer">
             <div>
-              {<div style={{ fontWeight: 600, color: '#fff6ed' }}>CesarPh</div>}
+              {<div style={{ fontWeight: 600, color: '#fff6ed' }}>artevisualenvivo</div>}
               <div style={{ marginTop: '6px' }}>
                 Fotografia de eventos, musica y retratos · Cobertura profesional para prensa y agencias
               </div>
