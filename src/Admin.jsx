@@ -1137,6 +1137,70 @@ export default function Admin() {
     }
   };
 
+  const deleteSelected = async () => {
+    const ids = selectedIds.filter(Boolean);
+    if (ids.length === 0) {
+      window.alert('Selecciona al menos una foto primero.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Eliminar ${ids.length} foto(s)? Esta accion no se puede deshacer y tambien borra las imagenes de Cloudinary.`
+    );
+    if (!confirmed) return;
+
+    setBulkUpdating(true);
+    setUploadStatus(null);
+
+    try {
+      const currentUser = getAuthenticatedUser();
+      const idToken = await currentUser.getIdToken();
+
+      const imageMap = new Map(
+        (activeAlbumGroup?.images || []).map((image) => [image.id, image])
+      );
+
+      for (const id of ids) {
+        const image = imageMap.get(id);
+        if (!image) continue;
+
+        if (image.cloudinaryPublicId) {
+          const response = await fetch('/api/delete-photo', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({ publicId: image.cloudinaryPublicId }),
+          });
+
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.error || result.details || 'No se pudo eliminar en Cloudinary');
+          }
+        }
+
+        await deleteDoc(doc(getPhotosCollection(), id));
+      }
+
+      await loadAdminData();
+      clearSelection();
+      setUploadStatus({
+        type: 'success',
+        message: `${ids.length} foto(s) eliminada(s) correctamente.`,
+      });
+      setTimeout(() => setUploadStatus(null), 2500);
+    } catch (error) {
+      setUploadStatus({
+        type: 'error',
+        message: 'No se pudieron eliminar todas las fotos.',
+        details: [error.message],
+      });
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
   if (!authReady) {
     return (
       <div style={{ padding: 20, fontFamily: 'Arial', maxWidth: '400px', margin: '100px auto', textAlign: 'center' }}>
@@ -2213,6 +2277,9 @@ export default function Admin() {
                   </button>
                   <button type="button" className="admin-batch-btn muted" onClick={() => applyToSelection({ isForSale: false }, 'Quitar de venta {n} foto(s)?', '{n} fuera de venta.')} disabled={bulkUpdating || selectedIds.length === 0}>
                     Quitar sel. de venta
+                  </button>
+                  <button type="button" className="admin-batch-btn danger" onClick={deleteSelected} disabled={bulkUpdating || selectedIds.length === 0}>
+                    Eliminar seleccionadas
                   </button>
                 </div>
 
