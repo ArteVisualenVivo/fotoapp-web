@@ -93,7 +93,7 @@ export function buildCloudinaryOptimizedUrl(sourceUrl, publicId) {
 }
 
 const CLOUDINARY_UPLOAD_MARKER = "/image/upload/";
-const PUBLIC_WATERMARK_TEXT = "cesardarioph";
+const PUBLIC_WATERMARK_TEXT = "artevisualenvivo";
 // Blanco con alfa: 6 digitos de color + 2 de alfa (B3 = ~70% opaco).
 // l_text NO acepta el parametro opacity; la transparencia va en el color.
 const PUBLIC_WATERMARK_COLOR = "FFFFFFB3";

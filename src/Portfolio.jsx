@@ -1529,7 +1529,7 @@ export default function Portfolio({ mode = 'gallery' }) {
         .portfolio-shell.is-shop .modal-overview-card::after,
         .portfolio-shell.is-shop .card-media::after,
         .portfolio-shell.is-shop .thumb-button::after {
-          content: "cesardarioph";
+          content: "artevisualenvivo";
           position: absolute;
           inset: 0;
           display: flex;
