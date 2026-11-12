@@ -1497,6 +1497,12 @@ export default function Portfolio({ mode = 'gallery' }) {
         .footer-socials { display:flex; gap:18px; margin-top:10px; }
         .footer-socials a { color:rgba(243,239,230,0.7); text-decoration:none; border-bottom:1px solid transparent; }
         .footer-socials a:hover { color:#f3efe6; border-color:rgba(201,168,106,0.6); }
+        .footer-shop-link { margin-bottom:10px; font-size:0.86rem; color:rgba(243,239,230,0.6); }
+        .footer-shop-link a { color:rgba(243,239,230,0.85); text-decoration:none; border-bottom:1px solid rgba(201,168,106,0.5); }
+        .footer-shop-link a:hover { color:#e9d9b6; border-color:#c9a86a; }
+        .contact-shop-link { margin-top:14px; padding-top:12px; border-top:1px solid rgba(243,239,230,0.1); }
+        .contact-shop-link a { color:rgba(243,239,230,0.72); text-decoration:none; font-size:0.86rem; border-bottom:1px solid rgba(201,168,106,0.45); }
+        .contact-shop-link a:hover { color:#e9d9b6; border-color:#c9a86a; }
 
         .hero-dots { display:flex; gap:6px; }
         .hero-dot { width:22px; height:2px; border:none; padding:0; background:rgba(243,239,230,0.2); cursor:pointer; }
@@ -1599,9 +1605,6 @@ export default function Portfolio({ mode = 'gallery' }) {
               <Link to="/" className={'contact-toggle' + (!isShop ? ' is-active' : '')} onClick={returnToPortfolio}>
                 Portfolio
               </Link>
-              <Link to="/tienda" className={'contact-toggle shop-cta' + (isShop ? ' is-active' : '')}>
-                Comprar fotos
-              </Link>
               <div className="nav-contact">
                 <button
                   type="button"
@@ -1650,6 +1653,14 @@ export default function Portfolio({ mode = 'gallery' }) {
                       <br />
                       {location}
                     </div>
+
+                    {!isShop && (
+                      <div className="contact-shop-link">
+                        <Link to="/tienda" onClick={() => setIsContactOpen(false)}>
+                          ¿Buscás las fotos de tu evento? Ver galería
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -2144,6 +2155,12 @@ export default function Portfolio({ mode = 'gallery' }) {
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
+              {!isShop && (
+                <div className="footer-shop-link">
+                  ¿Buscás las fotos de tu evento?{' '}
+                  <Link to="/tienda">Ver galería</Link>
+                </div>
+              )}
               <div>{contactEmail}</div>
               <div style={{ marginTop: '6px' }}>{location}</div>
             </div>
