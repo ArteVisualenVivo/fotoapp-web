@@ -472,6 +472,7 @@ export default function Portfolio({ mode = 'gallery' }) {
   const contactToggleRef = useRef(null);
   const heroCoverIndexRef = useRef(0);
   const heroSlideTimeoutRef = useRef(null);
+  const galleryTouchStartRef = useRef(0);
 
   useEffect(() => {
     const fetchPortfolio = async () => {
@@ -781,6 +782,36 @@ export default function Portfolio({ mode = 'gallery' }) {
   const closeGalleryModal = useCallback(() => {
     setGalleryModalIndex(null);
   }, []);
+
+  const goToGalleryPhoto = useCallback(
+    (offset) => {
+      setGalleryModalIndex((current) => {
+        if (current === null) return current;
+        const total = filteredGalleryImages.length;
+        if (total <= 1) return current;
+        return (current + offset + total) % total;
+      });
+    },
+    [filteredGalleryImages.length]
+  );
+
+  const onGalleryTouchStart = useCallback((event) => {
+    if (event.touches && event.touches.length > 0) {
+      galleryTouchStartRef.current = event.touches[0].clientX;
+    }
+  }, []);
+
+  const onGalleryTouchEnd = useCallback(
+    (event) => {
+      if (event.changedTouches && event.changedTouches.length > 0) {
+        const diff = event.changedTouches[0].clientX - galleryTouchStartRef.current;
+        if (Math.abs(diff) > 48) {
+          goToGalleryPhoto(diff < 0 ? 1 : -1);
+        }
+      }
+    },
+    [goToGalleryPhoto]
+  );
 
   useEffect(() => {
     if (!modalImage) return undefined;
@@ -1429,6 +1460,73 @@ export default function Portfolio({ mode = 'gallery' }) {
           width:72px; height:72px; border-radius:3px; overflow:hidden; border:1px solid rgba(243,239,230,0.1);
           padding:0; background:rgba(255,255,255,0.05); cursor:pointer; flex:0 0 auto; position:relative;
           box-shadow:0 14px 28px rgba(0,0,0,0.18);
+        }
+
+        /* ===== LIGHTBOX PROFESIONAL (portfolio / galeria plana) ===== */
+        .modal-overlay--gallery {
+          align-items:center; padding:14px;
+          background:rgba(3,3,4,0.94);
+          backdrop-filter:blur(18px) saturate(1.15);
+        }
+        .modal-overlay--gallery .modal-content {
+          width:min(1280px,96vw);
+          display:flex; flex-direction:column; align-items:center;
+        }
+        .modal-overlay--gallery .modal-image-wrap {
+          width:100%; border-radius:6px; border-color:rgba(243,239,230,0.16);
+          box-shadow:0 30px 80px rgba(0,0,0,0.55);
+        }
+        .modal-overlay--gallery .modal-image {
+          max-height:80vh;
+          animation:galleryImageIn 420ms cubic-bezier(0.16,1,0.3,1);
+        }
+        @keyframes galleryImageIn {
+          from { opacity:0; transform:scale(0.955); }
+          to { opacity:1; transform:scale(1); }
+        }
+        .modal-overlay--gallery .modal-info {
+          padding-top:18px; gap:12px;
+        }
+        .modal-overlay--gallery .modal-title {
+          font-size:clamp(1.05rem,1.6vw,1.35rem);
+        }
+        .gallery-close {
+          display:flex; align-items:center; justify-content:center;
+          width:44px; height:44px; border-radius:999px;
+          background:rgba(10,10,10,0.62);
+          border:1px solid rgba(255,255,255,0.14);
+          transition:transform 220ms ease, background 220ms ease, color 220ms ease;
+        }
+        .gallery-close svg { width:20px; height:20px; display:block; }
+        .gallery-close:hover {
+          background:rgba(201,168,106,0.92); color:#1c1306;
+          transform:rotate(90deg);
+        }
+        .gallery-nav {
+          display:flex; align-items:center; justify-content:center;
+          width:50px; height:50px; border-radius:999px;
+          background:rgba(10,10,10,0.58);
+          border:1px solid rgba(255,255,255,0.14);
+          transition:background 220ms ease, color 220ms ease, border-color 220ms ease;
+        }
+        .gallery-nav svg { width:22px; height:22px; display:block; }
+        .gallery-nav:hover {
+          background:rgba(201,168,106,0.92); color:#1c1306;
+          border-color:rgba(201,168,106,0.6);
+        }
+        .gallery-counter {
+          position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+          z-index:3; color:rgba(255,255,255,0.92); font-size:0.78rem; font-weight:600;
+          letter-spacing:0.14em; background:rgba(10,10,10,0.58); backdrop-filter:blur(10px);
+          border-radius:999px; padding:6px 14px; border:1px solid rgba(255,255,255,0.12);
+        }
+        @media (max-width: 780px) {
+          .modal-overlay--gallery { padding:8px; }
+          .modal-overlay--gallery .modal-image { max-height:72vh; }
+          .gallery-nav { width:46px; height:46px; }
+          .gallery-nav svg { width:20px; height:20px; }
+          .gallery-close { width:42px; height:42px; }
+          .modal-overlay--gallery .modal-info { padding-top:14px; }
         }
         /* ===== TIENDA: identidad verde, distinta al portfolio ambar ===== */
         .portfolio-shell.is-shop {
@@ -2375,10 +2473,16 @@ export default function Portfolio({ mode = 'gallery' }) {
 
         {/* ===== PORTFOLIO: lightbox de la galeria plana (independiente de la tienda) ===== */}
         {!isShop && galleryModalIndex !== null && filteredGalleryImages[galleryModalIndex] && (
-          <div className="modal-overlay" onClick={closeGalleryModal}>
+          <div
+            className="modal-overlay modal-overlay--gallery"
+            onClick={closeGalleryModal}
+            onTouchStart={onGalleryTouchStart}
+            onTouchEnd={onGalleryTouchEnd}
+          >
             <div className="modal-content" onClick={(event) => event.stopPropagation()}>
               <div className="modal-image-wrap">
                 <img
+                  key={filteredGalleryImages[galleryModalIndex].id}
                   className="modal-image"
                   src={filteredGalleryImages[galleryModalIndex].url}
                   alt={
@@ -2389,36 +2493,43 @@ export default function Portfolio({ mode = 'gallery' }) {
                   onContextMenu={blockImageInteraction}
                   onDragStart={blockImageInteraction}
                 />
-                <button type="button" className="modal-close" onClick={closeGalleryModal}>
-                  X
+                <button
+                  type="button"
+                  className="modal-close gallery-close"
+                  onClick={closeGalleryModal}
+                  aria-label="Cerrar"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                  </svg>
                 </button>
                 {filteredGalleryImages.length > 1 && (
                   <>
                     <button
                       type="button"
-                      className="modal-nav"
+                      className="modal-nav gallery-nav"
                       style={{ left: '18px' }}
-                      onClick={() =>
-                        setGalleryModalIndex(
-                          (current) =>
-                            (current - 1 + filteredGalleryImages.length) % filteredGalleryImages.length
-                        )
-                      }
+                      onClick={() => goToGalleryPhoto(-1)}
+                      aria-label="Anterior"
                     >
-                      {'<'}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m15 18-6-6 6-6" />
+                      </svg>
                     </button>
                     <button
                       type="button"
-                      className="modal-nav"
+                      className="modal-nav gallery-nav"
                       style={{ right: '18px' }}
-                      onClick={() =>
-                        setGalleryModalIndex(
-                          (current) => (current + 1) % filteredGalleryImages.length
-                        )
-                      }
+                      onClick={() => goToGalleryPhoto(1)}
+                      aria-label="Siguiente"
                     >
-                      {'>'}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m9 18 6-6-6-6" />
+                      </svg>
                     </button>
+                    <div className="gallery-counter">
+                      {galleryModalIndex + 1} / {filteredGalleryImages.length}
+                    </div>
                   </>
                 )}
               </div>
@@ -2427,9 +2538,6 @@ export default function Portfolio({ mode = 'gallery' }) {
                 {filteredGalleryImages[galleryModalIndex].label && (
                   <p className="modal-title">{filteredGalleryImages[galleryModalIndex].label}</p>
                 )}
-                <div className="modal-sub">
-                  {galleryModalIndex + 1} / {filteredGalleryImages.length}
-                </div>
                 <div className="modal-actions">
                   {filteredGalleryImages[galleryModalIndex].category && (
                     <span className="badge">{filteredGalleryImages[galleryModalIndex].category}</span>
