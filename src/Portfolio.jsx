@@ -568,7 +568,7 @@ export default function Portfolio({ mode = 'gallery' }) {
   }, [images, galleryFilter]);
 
   useEffect(() => {
-    const baseTitle = 'artevisualenvivo — Fotografía en Córdoba | Portfolio';
+    const baseTitle = 'ArteVisualenVivo — Fotografía en Córdoba | Portfolio';
     const shopTitle = 'Comprar fotos | ' + baseTitle;
     if (isShop) {
       document.title = selectedCategory ? selectedCategory + ' — ' + shopTitle : shopTitle;
@@ -1799,7 +1799,7 @@ export default function Portfolio({ mode = 'gallery' }) {
           <header className={'hero' + (!isShop ? ' is-gallery' : '')} id="portfolio">
             <div className="hero-copy">
               <div className="eyebrow">{isShop ? 'Tienda' : 'Portfolio'}</div>
-              <h1>{isShop ? 'Comprar fotos' : 'artevisualenvivo'}</h1>
+              <h1>{isShop ? 'Comprar fotos' : 'ArteVisualenVivo'}</h1>
               <p>
                 {isShop
                   ? 'Elegi tus fotos favoritas, marcalas y pedilas por WhatsApp. Los precios se calculan solos a medida que seleccionas.'
