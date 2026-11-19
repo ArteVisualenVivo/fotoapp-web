@@ -4,7 +4,7 @@ import { getDoc, getDocs } from 'firebase/firestore';
 import { getAdminSettingsRef, getPublicPhotosQuery, getShopPhotosQuery, normalizeLabel, normalizePhoto } from './firebase';
 
 const DEFAULT_WHATSAPP_MESSAGE = 'Hola, quiero consultar por estas fotos:';
-const DEFAULT_CONTACT_EMAIL = 'cesardarioph@gmail.com';
+const DEFAULT_CONTACT_EMAIL = 'artevisualenvivo@gmail.com';
 const DEFAULT_LOCATION = 'Cordoba, Argentina';
 const DEFAULT_PRICING_TITLE = 'Servicios y precios';
 const DEFAULT_PRICING_BODY =

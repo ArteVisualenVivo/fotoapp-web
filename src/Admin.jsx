@@ -20,7 +20,7 @@ const UPLOAD_RETRY_DELAY_MS = 1000;
 const IMAGE_MAX_DIMENSION = 2200;
 const IMAGE_QUALITY = 0.82;
 const DEFAULT_WHATSAPP_MESSAGE = 'Hola, quiero consultar por estas fotos:';
-const DEFAULT_CONTACT_EMAIL = 'cesardarioph@gmail.com';
+const DEFAULT_CONTACT_EMAIL = 'artevisualenvivo@gmail.com';
 const DEFAULT_LOCATION = 'Cordoba, Argentina';
 const DEFAULT_PRICING_TITLE = 'Servicios y precios';
 const DEFAULT_PRICING_BODY = 'Realizo coberturas, books, recitales, bodas, 15 aÃ±os, bautismos y retratos. Tambien puedo configurar fotos individuales, packs y coberturas editoriales segun el tipo de trabajo.';
@@ -1705,7 +1705,7 @@ export default function Admin() {
             type="email"
             value={contactEmail}
             onChange={(e) => setContactEmail(e.target.value)}
-            placeholder="cesardarioph@gmail.com"
+            placeholder="artevisualenvivo@gmail.com"
             style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem', boxSizing: 'border-box', transition: 'all 0.2s' }}
           />
         </div>
