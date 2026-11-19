@@ -1464,69 +1464,96 @@ export default function Portfolio({ mode = 'gallery' }) {
 
         /* ===== LIGHTBOX PROFESIONAL (portfolio / galeria plana) ===== */
         .modal-overlay--gallery {
-          align-items:center; padding:14px;
-          background:rgba(3,3,4,0.94);
-          backdrop-filter:blur(18px) saturate(1.15);
+          align-items:center; justify-content:center; padding:24px;
+          background:radial-gradient(circle at 50% 50%, rgba(10,10,12,0.98), rgba(3,3,4,0.99));
+          backdrop-filter:blur(24px) saturate(1.1);
         }
         .modal-overlay--gallery .modal-content {
-          width:min(1280px,96vw);
+          width:min(1320px,96vw);
+          max-height:92vh;
           display:flex; flex-direction:column; align-items:center;
         }
         .modal-overlay--gallery .modal-image-wrap {
-          width:100%; border-radius:6px; border-color:rgba(243,239,230,0.16);
-          box-shadow:0 30px 80px rgba(0,0,0,0.55);
+          position:relative; width:100%; border-radius:8px;
+          border:1px solid rgba(243,239,230,0.18);
+          box-shadow:0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,168,106,0.15);
         }
         .modal-overlay--gallery .modal-image {
-          max-height:80vh;
-          animation:galleryImageIn 420ms cubic-bezier(0.16,1,0.3,1);
+          width:100%; max-height:82vh; object-fit:contain; display:block;
+          animation:galleryImageIn 460ms cubic-bezier(0.16,1,0.3,1);
+          cursor:zoom-in; transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
+        }
+        .modal-overlay--gallery .modal-image:hover {
+          transform:scale(1.03);
         }
         @keyframes galleryImageIn {
-          from { opacity:0; transform:scale(0.955); }
+          from { opacity:0; transform:scale(0.94); }
           to { opacity:1; transform:scale(1); }
         }
         .modal-overlay--gallery .modal-info {
-          padding-top:18px; gap:12px;
+          padding-top:20px; gap:14px; text-align:center;
         }
         .modal-overlay--gallery .modal-title {
-          font-size:clamp(1.05rem,1.6vw,1.35rem);
+          margin:0; font-family:'Fraunces',Georgia,serif;
+          font-size:clamp(1.1rem,1.7vw,1.4rem); font-weight:500; letter-spacing:0.02em;
+          color:#f3efe6;
         }
+        .modal-overlay--gallery .modal-actions {
+          display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
+        }
+        .modal-overlay--gallery .badge {
+          font-size:0.72rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+        }
+
+        /* ---- Controles del lightbox ---- */
         .gallery-close {
-          display:flex; align-items:center; justify-content:center;
-          width:44px; height:44px; border-radius:999px;
-          background:rgba(10,10,10,0.62);
-          border:1px solid rgba(255,255,255,0.14);
-          transition:transform 220ms ease, background 220ms ease, color 220ms ease;
-        }
-        .gallery-close svg { width:20px; height:20px; display:block; }
-        .gallery-close:hover {
-          background:rgba(201,168,106,0.92); color:#1c1306;
-          transform:rotate(90deg);
-        }
-        .gallery-nav {
+          position:absolute; top:14px; right:14px;
           display:flex; align-items:center; justify-content:center;
           width:50px; height:50px; border-radius:999px;
-          background:rgba(10,10,10,0.58);
+          background:rgba(10,10,10,0.7); backdrop-filter:blur(12px);
+          border:1px solid rgba(255,255,255,0.16);
+          color:#fff; transition:all 260ms ease; z-index:4;
+        }
+        .gallery-close svg { width:22px; height:22px; display:block; }
+        .gallery-close:hover {
+          background:rgba(201,168,106,0.95); color:#1c1306; border-color:rgba(201,168,106,0.7);
+          transform:rotate(90deg) scale(1.05);
+        }
+
+        .gallery-nav {
+          position:absolute; top:50%; transform:translateY(-50%);
+          display:flex; align-items:center; justify-content:center;
+          width:56px; height:56px; border-radius:999px;
+          background:rgba(10,10,10,0.65); backdrop-filter:blur(12px);
           border:1px solid rgba(255,255,255,0.14);
-          transition:background 220ms ease, color 220ms ease, border-color 220ms ease;
+          color:#fff; opacity:0.6; transition:all 260ms ease; z-index:4;
         }
-        .gallery-nav svg { width:22px; height:22px; display:block; }
         .gallery-nav:hover {
-          background:rgba(201,168,106,0.92); color:#1c1306;
-          border-color:rgba(201,168,106,0.6);
+          opacity:1; background:rgba(201,168,106,0.92); color:#1c1306;
+          border-color:rgba(201,168,106,0.6); transform:scale(1.08);
         }
+        .gallery-nav svg { width:24px; height:24px; display:block; }
+        .gallery-nav-left { left:14px; }
+        .gallery-nav-right { right:14px; }
+
         .gallery-counter {
-          position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
-          z-index:3; color:rgba(255,255,255,0.92); font-size:0.78rem; font-weight:600;
-          letter-spacing:0.14em; background:rgba(10,10,10,0.58); backdrop-filter:blur(10px);
-          border-radius:999px; padding:6px 14px; border:1px solid rgba(255,255,255,0.12);
+          position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
+          z-index:4; color:rgba(255,255,255,0.9); font-size:0.75rem; font-weight:600;
+          letter-spacing:0.16em; background:rgba(10,10,10,0.7); backdrop-filter:blur(10px);
+          border-radius:999px; padding:6px 16px; border:1px solid rgba(255,255,255,0.12);
         }
+
         @media (max-width: 780px) {
-          .modal-overlay--gallery { padding:8px; }
-          .modal-overlay--gallery .modal-image { max-height:72vh; }
-          .gallery-nav { width:46px; height:46px; }
-          .gallery-nav svg { width:20px; height:20px; }
-          .gallery-close { width:42px; height:42px; }
-          .modal-overlay--gallery .modal-info { padding-top:14px; }
+          .modal-overlay--gallery { padding:10px; }
+          .modal-overlay--gallery .modal-image { max-height:70vh; }
+          .gallery-close { width:44px; height:44px; top:10px; right:10px; }
+          .gallery-close svg { width:20px; height:20px; }
+          .gallery-nav { width:48px; height:48px; opacity:0.75; }
+          .gallery-nav-left { left:8px; }
+          .gallery-nav-right { right:8px; }
+          .gallery-nav svg { width:22px; height:22px; }
+          .gallery-counter { bottom:12px; font-size:0.7rem; padding:5px 14px; }
+        }
         }
         /* ===== TIENDA: identidad verde, distinta al portfolio ambar ===== */
         .portfolio-shell.is-shop {
@@ -2507,8 +2534,7 @@ export default function Portfolio({ mode = 'gallery' }) {
                   <>
                     <button
                       type="button"
-                      className="modal-nav gallery-nav"
-                      style={{ left: '18px' }}
+                      className="modal-nav gallery-nav gallery-nav-left"
                       onClick={() => goToGalleryPhoto(-1)}
                       aria-label="Anterior"
                     >
@@ -2518,8 +2544,7 @@ export default function Portfolio({ mode = 'gallery' }) {
                     </button>
                     <button
                       type="button"
-                      className="modal-nav gallery-nav"
-                      style={{ right: '18px' }}
+                      className="modal-nav gallery-nav gallery-nav-right"
                       onClick={() => goToGalleryPhoto(1)}
                       aria-label="Siguiente"
                     >
